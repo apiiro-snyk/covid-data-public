@@ -71,6 +71,11 @@ COUNTY_BACKFILLED_CASES = [
     ("48113", "2020-08-24", 84),
     # https://covid-19-in-jefferson-county-ky-lojic.hub.arcgis.com/
     ("21111", "2020-09-03", 500),
+    # https://www.ibj.com/articles/official-covid-19-cases-surpass-20000-in-marion-county/
+    # NYT inaccurately showed 411 instead of 426
+    ("18097", "2020-09-13", 396),
+    # https://www.ksat.com/news/local/2020/09/14/142-new-covid-19-cases-24-deaths-reported-for-san-antonio-bexar-county/
+    ("48029", "2020-09-13", 1575),
 ]
 
 
