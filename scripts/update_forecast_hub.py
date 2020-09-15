@@ -194,23 +194,17 @@ def get_latest_forecast_date(conn, project_name: str, model_abbr: str) -> str:
 
     https://github.com/reichlab/zoltpy/issues/42
 
-    Looking to have this live in Zoltpy so I am keeping this out of the class.
-    TODO: Implement the solution recommended by Zoltpy in the above issue.
 
     Return the str date representation of the latest forecast if available, else the empty string.
     """
 
     project = [project for project in conn.projects if project.name == project_name][0]
     model = [model for model in project.models if model.abbreviation == model_abbr][0]
-
-    timezero_dates = [
-        datetime.datetime.strptime(forecast.timezero.timezero_date, YYYY_MM_DD_DATE_FORMAT).date()
-        for forecast in model.forecasts
-    ]
-    if timezero_dates:
-        latest_forecast_date = str(max(timezero_dates))
+    latest_forecast_date = model.latest_forecast.timezero.timezero_date
+    # Note: model.latest_forecast.timezero.timezero_date is of type datetime.datetime or None
+    if latest_forecast_date:
         _logger.info(f"Latest forecast for {model_abbr} is {latest_forecast_date}")
-        return latest_forecast_date
+        return str(latest_forecast_date)
     else:
         _logger.info(f"No forecasts found for {model_abbr} in {project_name}")
         return ""
