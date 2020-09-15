@@ -50,6 +50,10 @@ jobs:
         # Key was created for tom@covidactnow.org, then copied from ~/.cmdc/apikey to
         # https://github.com/organizations/covid-projections/settings/secrets
         CMDC_API_KEY: ${{ secrets.CMDC_API_KEY }}
+        # Z username and password are for the CDC Reich Lab Forecast Hub and were generated for
+        # brett@covidactnow.org and then copied to the github account secrets.
+        Z_USERNAME: ${{ secrets.Z_USERNAME }}
+        Z_PASSWORD: ${{ secrets.Z_PASSWORD }}
     - name: Create Update Commit
       run: ./push_update.sh
     - name: Trigger Covid Data Model Dataset Update
