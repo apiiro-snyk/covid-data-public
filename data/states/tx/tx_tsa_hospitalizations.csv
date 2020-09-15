@@ -154,6 +154,7 @@ A,Amarillo,2020-09-10,47.0,23.0
 A,Amarillo,2020-09-11,44.0,22.0
 A,Amarillo,2020-09-12,42.0,23.0
 A,Amarillo,2020-09-13,46.0,22.0
+A,Amarillo,2020-09-14,68.0,31.0
 B,Lubbock,2020-04-12,34.0,12.0
 B,Lubbock,2020-04-13,35.0,12.0
 B,Lubbock,2020-04-14,31.0,14.0
@@ -309,6 +310,7 @@ B,Lubbock,2020-09-10,85.0,36.0
 B,Lubbock,2020-09-11,81.0,39.0
 B,Lubbock,2020-09-12,83.0,37.0
 B,Lubbock,2020-09-13,84.0,34.0
+B,Lubbock,2020-09-14,90.0,39.0
 C,Wichita Falls,2020-04-12,5.0,1.0
 C,Wichita Falls,2020-04-13,5.0,0.0
 C,Wichita Falls,2020-04-14,6.0,0.0
@@ -464,6 +466,7 @@ C,Wichita Falls,2020-09-10,34.0,5.0
 C,Wichita Falls,2020-09-11,29.0,4.0
 C,Wichita Falls,2020-09-12,31.0,6.0
 C,Wichita Falls,2020-09-13,28.0,6.0
+C,Wichita Falls,2020-09-14,27.0,6.0
 D,Abilene,2020-04-12,6.0,2.0
 D,Abilene,2020-04-13,7.0,3.0
 D,Abilene,2020-04-14,2.0,0.0
@@ -619,6 +622,7 @@ D,Abilene,2020-09-10,30.0,12.0
 D,Abilene,2020-09-11,27.0,9.0
 D,Abilene,2020-09-12,27.0,9.0
 D,Abilene,2020-09-13,29.0,12.0
+D,Abilene,2020-09-14,30.0,13.0
 E,Dallas/Ft. Worth,2020-04-12,369.0,161.0
 E,Dallas/Ft. Worth,2020-04-13,365.0,256.0
 E,Dallas/Ft. Worth,2020-04-14,373.0,150.0
@@ -774,6 +778,7 @@ E,Dallas/Ft. Worth,2020-09-10,780.0,234.0
 E,Dallas/Ft. Worth,2020-09-11,750.0,215.0
 E,Dallas/Ft. Worth,2020-09-12,741.0,210.0
 E,Dallas/Ft. Worth,2020-09-13,762.0,215.0
+E,Dallas/Ft. Worth,2020-09-14,776.0,221.0
 F,Paris,2020-04-12,14.0,12.0
 F,Paris,2020-04-13,16.0,11.0
 F,Paris,2020-04-14,21.0,9.0
@@ -929,6 +934,7 @@ F,Paris,2020-09-10,81.0,29.0
 F,Paris,2020-09-11,82.0,30.0
 F,Paris,2020-09-12,70.0,26.0
 F,Paris,2020-09-13,74.0,26.0
+F,Paris,2020-09-14,78.0,29.0
 G,Longview/Tyler,2020-04-12,32.0,16.0
 G,Longview/Tyler,2020-04-13,26.0,13.0
 G,Longview/Tyler,2020-04-14,33.0,17.0
@@ -1084,6 +1090,7 @@ G,Longview/Tyler,2020-09-10,174.0,64.0
 G,Longview/Tyler,2020-09-11,188.0,63.0
 G,Longview/Tyler,2020-09-12,172.0,62.0
 G,Longview/Tyler,2020-09-13,172.0,59.0
+G,Longview/Tyler,2020-09-14,168.0,63.0
 H,Lufkin,2020-04-12,15.0,5.0
 H,Lufkin,2020-04-13,18.0,4.0
 H,Lufkin,2020-04-14,23.0,5.0
@@ -1239,6 +1246,7 @@ H,Lufkin,2020-09-10,44.0,20.0
 H,Lufkin,2020-09-11,43.0,19.0
 H,Lufkin,2020-09-12,39.0,17.0
 H,Lufkin,2020-09-13,24.0,15.0
+H,Lufkin,2020-09-14,31.0,17.0
 I,El Paso,2020-04-12,14.0,6.0
 I,El Paso,2020-04-13,23.0,9.0
 I,El Paso,2020-04-14,12.0,6.0
@@ -1394,6 +1402,7 @@ I,El Paso,2020-09-10,110.0,48.0
 I,El Paso,2020-09-11,113.0,46.0
 I,El Paso,2020-09-12,114.0,48.0
 I,El Paso,2020-09-13,110.0,45.0
+I,El Paso,2020-09-14,110.0,47.0
 J,Midland/Odessa,2020-04-12,10.0,4.0
 J,Midland/Odessa,2020-04-13,11.0,4.0
 J,Midland/Odessa,2020-04-14,17.0,9.0
@@ -1549,6 +1558,7 @@ J,Midland/Odessa,2020-09-10,67.0,20.0
 J,Midland/Odessa,2020-09-11,71.0,16.0
 J,Midland/Odessa,2020-09-12,65.0,18.0
 J,Midland/Odessa,2020-09-13,64.0,17.0
+J,Midland/Odessa,2020-09-14,55.0,15.0
 K,San Angelo,2020-04-12,0.0,0.0
 K,San Angelo,2020-04-13,0.0,0.0
 K,San Angelo,2020-04-14,0.0,0.0
@@ -1704,6 +1714,7 @@ K,San Angelo,2020-09-10,32.0,1.0
 K,San Angelo,2020-09-11,30.0,1.0
 K,San Angelo,2020-09-12,29.0,1.0
 K,San Angelo,2020-09-13,28.0,1.0
+K,San Angelo,2020-09-14,25.0,1.0
 L,Belton/Killeen,2020-04-12,11.0,10.0
 L,Belton/Killeen,2020-04-13,12.0,6.0
 L,Belton/Killeen,2020-04-14,13.0,6.0
@@ -1859,6 +1870,7 @@ L,Belton/Killeen,2020-09-10,40.0,22.0
 L,Belton/Killeen,2020-09-11,37.0,17.0
 L,Belton/Killeen,2020-09-12,32.0,12.0
 L,Belton/Killeen,2020-09-13,32.0,12.0
+L,Belton/Killeen,2020-09-14,33.0,14.0
 M,Waco,2020-04-12,9.0,5.0
 M,Waco,2020-04-13,2.0,2.0
 M,Waco,2020-04-14,5.0,2.0
@@ -2014,6 +2026,7 @@ M,Waco,2020-09-10,37.0,14.0
 M,Waco,2020-09-11,37.0,13.0
 M,Waco,2020-09-12,38.0,13.0
 M,Waco,2020-09-13,33.0,12.0
+M,Waco,2020-09-14,33.0,10.0
 N,Bryan/College Station,2020-04-12,24.0,8.0
 N,Bryan/College Station,2020-04-13,31.0,17.0
 N,Bryan/College Station,2020-04-14,13.0,6.0
@@ -2169,6 +2182,7 @@ N,Bryan/College Station,2020-09-10,23.0,5.0
 N,Bryan/College Station,2020-09-11,17.0,5.0
 N,Bryan/College Station,2020-09-12,17.0,5.0
 N,Bryan/College Station,2020-09-13,16.0,4.0
+N,Bryan/College Station,2020-09-14,11.0,4.0
 O,Austin,2020-04-12,22.0,12.0
 O,Austin,2020-04-13,26.0,15.0
 O,Austin,2020-04-14,28.0,16.0
@@ -2324,6 +2338,7 @@ O,Austin,2020-09-10,125.0,51.0
 O,Austin,2020-09-11,121.0,50.0
 O,Austin,2020-09-12,106.0,42.0
 O,Austin,2020-09-13,102.0,42.0
+O,Austin,2020-09-14,100.0,45.0
 P,San Antonio,2020-04-12,57.0,22.0
 P,San Antonio,2020-04-13,57.0,22.0
 P,San Antonio,2020-04-14,64.0,25.0
@@ -2479,6 +2494,7 @@ P,San Antonio,2020-09-10,325.0,102.0
 P,San Antonio,2020-09-11,328.0,124.0
 P,San Antonio,2020-09-12,315.0,119.0
 P,San Antonio,2020-09-13,291.0,109.0
+P,San Antonio,2020-09-14,285.0,114.0
 Q,Houston,2020-04-12,516.0,214.0
 Q,Houston,2020-04-13,319.0,134.0
 Q,Houston,2020-04-14,527.0,234.0
@@ -2634,6 +2650,7 @@ Q,Houston,2020-09-10,634.0,233.0
 Q,Houston,2020-09-11,598.0,205.0
 Q,Houston,2020-09-12,603.0,215.0
 Q,Houston,2020-09-13,599.0,203.0
+Q,Houston,2020-09-14,591.0,193.0
 R,Galveston,2020-04-12,76.0,30.0
 R,Galveston,2020-04-13,84.0,34.0
 R,Galveston,2020-04-14,97.0,37.0
@@ -2789,6 +2806,7 @@ R,Galveston,2020-09-10,158.0,53.0
 R,Galveston,2020-09-11,158.0,50.0
 R,Galveston,2020-09-12,150.0,43.0
 R,Galveston,2020-09-13,156.0,41.0
+R,Galveston,2020-09-14,146.0,45.0
 S,Victoria,2020-04-12,16.0,4.0
 S,Victoria,2020-04-13,21.0,6.0
 S,Victoria,2020-04-14,22.0,5.0
@@ -2944,6 +2962,7 @@ S,Victoria,2020-09-10,63.0,22.0
 S,Victoria,2020-09-11,67.0,25.0
 S,Victoria,2020-09-12,70.0,26.0
 S,Victoria,2020-09-13,62.0,26.0
+S,Victoria,2020-09-14,70.0,28.0
 T,Laredo,2020-04-12,25.0,12.0
 T,Laredo,2020-04-13,24.0,11.0
 T,Laredo,2020-04-14,28.0,11.0
@@ -3099,6 +3118,7 @@ T,Laredo,2020-09-10,122.0,55.0
 T,Laredo,2020-09-11,111.0,54.0
 T,Laredo,2020-09-12,112.0,52.0
 T,Laredo,2020-09-13,107.0,52.0
+T,Laredo,2020-09-14,107.0,51.0
 U,Corpus Christi,2020-04-12,9.0,5.0
 U,Corpus Christi,2020-04-13,12.0,5.0
 U,Corpus Christi,2020-04-14,9.0,5.0
@@ -3254,6 +3274,7 @@ U,Corpus Christi,2020-09-10,156.0,46.0
 U,Corpus Christi,2020-09-11,131.0,39.0
 U,Corpus Christi,2020-09-12,129.0,39.0
 U,Corpus Christi,2020-09-13,121.0,36.0
+U,Corpus Christi,2020-09-14,112.0,32.0
 V,Lower Rio Grande Valley,2020-04-12,57.0,18.0
 V,Lower Rio Grande Valley,2020-04-13,65.0,22.0
 V,Lower Rio Grande Valley,2020-04-14,68.0,32.0
@@ -3409,6 +3430,7 @@ V,Lower Rio Grande Valley,2020-09-10,408.0,159.0
 V,Lower Rio Grande Valley,2020-09-11,402.0,152.0
 V,Lower Rio Grande Valley,2020-09-12,386.0,151.0
 V,Lower Rio Grande Valley,2020-09-13,379.0,151.0
+V,Lower Rio Grande Valley,2020-09-14,379.0,147.0
 Total,Statewide Total,2020-04-12,1338.0,563.0
 Total,Statewide Total,2020-04-13,1176.0,591.0
 Total,Statewide Total,2020-04-14,1409.0,594.0
@@ -3564,3 +3586,4 @@ Total,Statewide Total,2020-09-10,3575.0,1254.0
 Total,Statewide Total,2020-09-11,3465.0,1198.0
 Total,Statewide Total,2020-09-12,3371.0,1174.0
 Total,Statewide Total,2020-09-13,3319.0,1140.0
+Total,Statewide Total,2020-09-14,3391.0,1165.0
