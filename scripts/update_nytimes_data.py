@@ -76,6 +76,8 @@ COUNTY_BACKFILLED_CASES = [
     ("18097", "2020-09-13", 396),
     # https://www.ksat.com/news/local/2020/09/14/142-new-covid-19-cases-24-deaths-reported-for-san-antonio-bexar-county/
     ("48029", "2020-09-13", 1575),
+    # https://harriscounty.maps.arcgis.com/apps/opsdashboard/index.html#/c0de71f8ea484b85bb5efcb7c07c6914
+    ("48201", "2020-09-15", 2378),
 ]
 
 
