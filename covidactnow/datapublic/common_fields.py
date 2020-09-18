@@ -29,6 +29,10 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, str, Enum):
 
     DATE = "date"
 
+    # In the style of CovidAtlas/Project Li `locationID`. See
+    # https://github.com/covidatlas/li/blob/master/docs/reports-v1.md#general-notes
+    LOCATION_ID = "location_id"
+
     # 2 letter state abbreviation, i.e. MA
     STATE = "state"
 
