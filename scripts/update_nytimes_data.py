@@ -40,6 +40,10 @@ STATE_BACKFILLED_CASES = [
     # This number is a bit fuzzy, but on 9/3 there were 767 cases.  There were 1400 cases
     # on 9/4 including backfill.  Estimating 800 cases on 9/4.
     ("55", "2020-09-04", 1400 - 800),
+    # https://directorsblog.health.azdhs.gov/covid-19-antigen-tests/
+    ("04", "2020-09-17", 577),
+    # https://twitter.com/AZDHS/status/1306974258124468226
+    ("04", "2020-09-18", 764),
 ]
 
 
