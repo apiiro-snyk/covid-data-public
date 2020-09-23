@@ -82,6 +82,35 @@ COUNTY_BACKFILLED_CASES = [
     ("48029", "2020-09-13", 1575),
     # https://harriscounty.maps.arcgis.com/apps/opsdashboard/index.html#/c0de71f8ea484b85bb5efcb7c07c6914
     ("48201", "2020-09-15", 2378),
+    # https://trello.com/c/CEkDc3ZO/462-large-tx-backfill-on-9-21
+    ("48029", "2020-09-20", 2078),  # Bexar County, TX
+    ("48113", "2020-09-20", 306),  # Dallas County, TX
+    ("48001", "2020-09-21", 1051),  # Anderson County, TX
+    ("48085", "2020-09-21", 3),  # Collin County, TX
+    ("48163", "2020-09-21", 298),  # Frio County, TX
+    ("48201", "2020-09-21", 328),  # Harris County, TX
+    ("48225", "2020-09-21", 1),  # Houston County, TX
+    ("48439", "2020-09-21", 125),  # Tarrant County, TX
+    ("48013", "2020-09-21", 522),  # Atascosa County, TX
+    ("48019", "2020-09-21", 41),  # Bandera County, TX
+    ("48057", "2020-09-21", 186),  # Calhoun County, TX
+    ("48113", "2020-09-21", 2),  # Dallas County, TX
+    ("48127", "2020-09-21", 53),  # Dimmit County, TX
+    ("48137", "2020-09-21", 33),  # Edwards County, TX
+    ("48171", "2020-09-21", 96),  # Gillespie County, TX
+    ("48177", "2020-09-21", 234),  # Gonzales County, TX
+    ("48187", "2020-09-21", 1587),  # Guadalupe County, TX
+    ("48201", "2020-09-21", 13622),  # Harris County, TX
+    ("48239", "2020-09-21", 77),  # Jackson County, TX
+    ("48255", "2020-09-21", 181),  # Karnes County, TX
+    ("48265", "2020-09-21", 142),  # Kerr County, TX
+    ("48271", "2020-09-21", 19),  # Kinney County, TX
+    ("48285", "2020-09-21", 252),  # Lavaca County, TX
+    ("48355", "2020-09-21", 231),  # Nueces County, TX
+    ("48385", "2020-09-21", 12),  # Real County, TX
+    ("48493", "2020-09-21", 307),  # Wilson County, TX
+    ("48507", "2020-09-21", 52),  # Zavala County, TX
+    ("48407", "2020-09-22", 1),  # San Jacinto, TX
 ]
 
 
