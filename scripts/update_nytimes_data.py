@@ -44,6 +44,8 @@ STATE_BACKFILLED_CASES = [
     ("04", "2020-09-17", 577),
     # https://twitter.com/AZDHS/status/1306974258124468226
     ("04", "2020-09-18", 764),
+    # https://trello.com/c/9EbBRV1Z/472-2020-09-26-north-carolina-change-in-methodology-to-count-cases
+    ("37", "2020-09-25", 4544),
 ]
 
 
