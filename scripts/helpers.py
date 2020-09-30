@@ -1,9 +1,9 @@
 import pathlib
-from typing import Optional, MutableMapping
+import re
+from typing import MutableMapping
 
 import pandas as pd
 
-from covidactnow.datapublic.common_fields import CommonFields
 
 UNEXPECTED_COLUMNS_MESSAGE = "DataFrame columns do not match expected fields"
 
@@ -24,6 +24,12 @@ def rename_fields(df, fields, already_transformed_fields, log) -> pd.DataFrame:
         log.warning(
             UNEXPECTED_COLUMNS_MESSAGE, extra_fields=extra_fields, missing_fields=missing_fields,
         )
+    if extra_fields:
+        print("-- Add the following lines to the approriate Fields enum --")
+        for extra_field in extra_fields:
+            enum_name = re.sub(r"(?<!^)(?=[A-Z])", "_", extra_field).upper()
+            print(f'    {enum_name} = "{extra_field}", None')
+        print("-- end of suggested new Fields --")
     rename: MutableMapping[str, str] = {f: f for f in already_transformed_fields}
     for col in df.columns:
         field = fields.get(col)
