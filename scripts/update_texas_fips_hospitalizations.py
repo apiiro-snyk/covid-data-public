@@ -16,6 +16,7 @@ TSA_HOSPITALIZATIONS_URL = (
 )
 
 
+@enum.unique
 class Fields(common_fields.GetByValueMixin, common_fields.FieldNameAndCommonField, enum.Enum):
     DATE = "date", CommonFields.DATE
     TSA_REGION_ID = "TSA ID", None

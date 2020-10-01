@@ -1,13 +1,14 @@
+import enum
 import json
 import logging
 import datetime
 import pathlib
-from enum import Enum
 
 import click
 import pytz
 import requests
 import pandas as pd
+import numpy as np
 import structlog
 
 from covidactnow.datapublic import common_df
@@ -22,6 +23,11 @@ COVID_TRACKING_ROOT = DATA_ROOT / "covid-tracking"
 LOCAL_JSON_PATH = COVID_TRACKING_ROOT / "states.json"
 TIMESERIES_CSV_PATH = COVID_TRACKING_ROOT / "timeseries.csv"
 HISTORICAL_STATE_DATA_URL = "http://covidtracking.com/api/states/daily"
+
+ICU_HOSPITALIZED_MISMATCH_WARNING_MESSAGE = (
+    "Removed ICU current where it is more than hospitalized current"
+)
+
 
 _logger = logging.getLogger(__name__)
 
@@ -72,7 +78,8 @@ class CovidTrackingDataUpdater(object):
         version_path.write_text(f"Updated at {self._stamp()}\n")
 
 
-class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
+@enum.unique
+class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     # ISO 8601 date of when these values were valid.
     DATE_CHECKED = "dateChecked", None
     STATE = "state", CommonFields.STATE
@@ -102,9 +109,7 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
     TOTAL_TEST_RESULTS_INCREASE = "totalTestResultsIncrease", None
 
     IN_ICU_CURRENTLY = "inIcuCurrently", CommonFields.CURRENT_ICU
-    IN_ICU_CUMULATIVE = "inIcuCumulative", None
-
-    TOTAL_IN_ICU = "inIcuCumulative", CommonFields.CUMULATIVE_ICU
+    IN_ICU_CUMULATIVE = "inIcuCumulative", CommonFields.CUMULATIVE_ICU
 
     ON_VENTILATOR_CURRENTLY = "onVentilatorCurrently", CommonFields.CURRENT_VENTILATED
     TOTAL_ON_VENTILATOR = "onVentilatorCumulative", None
@@ -151,10 +156,31 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
 def transform(df: pd.DataFrame) -> pd.DataFrame:
     """Transforms data from load_local_json to the common fields."""
     log = structlog.get_logger()
+
+    # Removing CT state testing data from three days where numbers were incomplete or negative.
+    is_ct = df.state == "CT"
+    dates_to_remove = ["20200717", "20200718", "20200719"]
+    df.loc[is_ct & df.date.isin(dates_to_remove), ["negative", "positive"]] = np.nan
+
     df[CommonFields.DATE] = pd.to_datetime(df[Fields.DATE], format="%Y%m%d")
 
-    # TODO(tom): Add all the other fixes and tweaks in CovidTrackingDataUpdater and
-    # covid-data-model/.../covid_tracking_source.py
+    # Removing bad data from Delaware.
+    # Once that is resolved we can remove this while keeping the assert below.
+    icu_mask = df[Fields.IN_ICU_CURRENTLY] > df[Fields.CURRENT_HOSPITALIZED]
+    if icu_mask.any():
+        df.loc[icu_mask, Fields.IN_ICU_CURRENTLY] = np.nan
+        log.warning(
+            ICU_HOSPITALIZED_MISMATCH_WARNING_MESSAGE,
+            lines_changed=icu_mask.sum(),
+            unique_states=df[icu_mask]["state"].nunique(),
+        )
+
+    # Current Sanity Check and Filter for In ICU.
+    # This should fail for Delaware right now unless we patch it.
+    # The 'not any' style is to deal with comparisons to np.nan.
+    assert not (
+        df[Fields.IN_ICU_CURRENTLY] > df[Fields.CURRENT_HOSPITALIZED]
+    ).any(), "IN_ICU_CURRENTLY field is greater than CURRENT_HOSPITALIZED"
 
     already_transformed_fields = {Fields.DATE}
 

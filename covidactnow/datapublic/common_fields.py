@@ -1,8 +1,8 @@
 """
 Data schema shared between code in covid-data-public and covid-data-model repos.
 """
+import enum
 from typing import Optional
-from enum import Enum
 
 
 class GetByValueMixin:
@@ -22,7 +22,8 @@ class ValueAsStrMixin:
         return self.value
 
 
-class CommonFields(GetByValueMixin, ValueAsStrMixin, str, Enum):
+@enum.unique
+class CommonFields(GetByValueMixin, ValueAsStrMixin, str, enum.Enum):
     """Common field names shared across different sources of data"""
 
     FIPS = "fips"

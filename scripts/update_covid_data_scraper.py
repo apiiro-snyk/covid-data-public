@@ -1,3 +1,4 @@
+import enum
 from enum import Enum
 from typing import Union
 
@@ -24,6 +25,7 @@ DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 TIMESERIES_CSV_URL = r"https://coronadatascraper.com/timeseries.csv.zip"
 
 
+@enum.unique
 class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
     LOCATION_ID = "locationID", None
     SLUG = "slug", None

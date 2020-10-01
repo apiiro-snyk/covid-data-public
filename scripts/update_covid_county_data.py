@@ -1,8 +1,7 @@
-from typing import Union, MutableMapping, Optional
+import enum
+from typing import Union, Optional
 import os
 import pathlib
-import sys
-from enum import Enum
 import pandas as pd
 
 import structlog
@@ -26,7 +25,8 @@ DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 
 # Keep in sync with COMMON_FIELD_MAP in covid_county_data.py in the covid-data-model repo.
 # Fields commented out with tag 20200616 were not found in the data used by update_covid_county_data_test.py.
-class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
+@enum.unique
+class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     LOCATION = "location", None  # Special transformation to FIPS
     DT = "dt", CommonFields.DATE
 

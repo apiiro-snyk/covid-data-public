@@ -235,6 +235,7 @@ def _remove_ma_county_zeroes_data(
     )
 
 
+@enum.unique
 class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     DATE = "date", CommonFields.DATE
     COUNTY = "county", CommonFields.COUNTY

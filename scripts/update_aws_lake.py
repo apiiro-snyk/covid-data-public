@@ -1,9 +1,8 @@
+import enum
 import pathlib
 import shutil
-import sys
 from collections import defaultdict
-from enum import Enum
-from typing import Union, Optional, List, Dict, Any, Iterable, Tuple, Set
+from typing import Union, Optional, List, Dict, Any, Iterable, Tuple
 
 import boto3
 import botocore
@@ -29,7 +28,8 @@ from scripts import helpers
 DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 
 
-class Fields(GetByValueMixin, FieldNameAndCommonField, Enum):
+@enum.unique
+class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     TIME_VALUE = "time_value", CommonFields.DATE
     TIME_TYPE = "time_type", None
     GEO_VALUE = "geo_value", None
