@@ -341,10 +341,9 @@ class NYTimesUpdater(pydantic.BaseModel):
         data[CommonFields.COUNTRY] = "USA"
 
         # Rename new york city to new york county and assign it to New York County FIPS
-        data.loc[
-            data[CommonFields.COUNTY] == "New York City", CommonFields.COUNTY
-        ] = "New York County"
-        data.loc[data[CommonFields.COUNTY] == "New York County", CommonFields.FIPS] = "36061"
+        ny_mask = data[CommonFields.COUNTY].astype(str) == "New York City"
+        data.loc[ny_mask, CommonFields.COUNTY] = "New York County"
+        data.loc[ny_mask, CommonFields.FIPS] = "36061"
 
         data = remove_state_backfilled_cases(data, STATE_BACKFILLED_CASES)
         data = remove_county_backfilled_cases(data, COUNTY_BACKFILLED_CASES)

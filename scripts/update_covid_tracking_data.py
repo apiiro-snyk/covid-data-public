@@ -104,7 +104,7 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     # Tests that have been submitted to a lab but no results have been reported yet.
     PENDING = "pending", None
     # Calculated value (positive + negative) of total test results.
-    TOTAL_TEST_RESULTS = "totalTestResults", None
+    TOTAL_TEST_RESULTS = "totalTestResults", CommonFields.TOTAL_TESTS
     # Increase from the day before.
     TOTAL_TEST_RESULTS_INCREASE = "totalTestResultsIncrease", None
 
@@ -130,12 +130,12 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     TOTAL_TEST_RESULTS_SOURCE = "totalTestResultsSource", None
     CHECK_TIME_ET = "checkTimeEt", None
     POSITIVE_TESTS_ANTIGEN = "positiveTestsAntigen", None
-    TOTAL_TESTS_PEOPLE_VIRAL = "totalTestsPeopleViral", None
-    TOTAL_TESTS_VIRAL = "totalTestsViral", None
+    TOTAL_TESTS_PEOPLE_VIRAL = "totalTestsPeopleViral", CommonFields.TOTAL_TESTS_PEOPLE_VIRAL
+    TOTAL_TESTS_VIRAL = "totalTestsViral", CommonFields.TOTAL_TESTS_VIRAL
     RECOVERED = "recovered", None
     NEGATIVE_TESTS_ANTIBODY = "negativeTestsAntibody", None
     COMMERCIAL_SCORE = "commercialScore", None
-    POSITIVE_CASES_VIRAL = "positiveCasesViral", None
+    POSITIVE_CASES_VIRAL = "positiveCasesViral", CommonFields.POSITIVE_CASES_VIRAL
     SCORE = "score", None
     LAST_UPDATE_ET = "lastUpdateEt", None
     NEGATIVE_TESTS_PEOPLE_ANTIBODY = "negativeTestsPeopleAntibody", None
@@ -144,13 +144,17 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     DATA_QUALITY_GRADE = "dataQualityGrade", None
     NEGATIVE_REGULAR_SCORE = "negativeRegularScore", None
     POSITIVE_TESTS_ANTIBODY = "positiveTestsAntibody", None
-    POSITIVE_TESTS_VIRAL = "positiveTestsViral", None
-    TOTAL_TEST_ENCOUNTERS_VIRAL = "totalTestEncountersViral", None
+    POSITIVE_TESTS_VIRAL = "positiveTestsViral", CommonFields.POSITIVE_TESTS_VIRAL
+    TOTAL_TEST_ENCOUNTERS_VIRAL = (
+        "totalTestEncountersViral",
+        CommonFields.TOTAL_TEST_ENCOUNTERS_VIRAL,
+    )
     TOTAL_TESTS_PEOPLE_ANTIGEN = "totalTestsPeopleAntigen", None
     NEGATIVE_TESTS_VIRAL = "negativeTestsViral", None
     GRADE = "grade", None
     POSITIVE_SCORE = "positiveScore", None
     POSITIVE_TESTS_PEOPLE_ANTIGEN = "positiveTestsPeopleAntigen", None
+    PROBABLE_CASES = "probableCases", None
 
 
 def transform(df: pd.DataFrame) -> pd.DataFrame:

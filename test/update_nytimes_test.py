@@ -1,15 +1,15 @@
-import structlog
 import io
 
 import pytest
 import pandas as pd
 
-from more_itertools import one
 from covidactnow.datapublic import common_df
 from scripts import update_nytimes_data
 from scripts.update_nytimes_data import NYTimesUpdater, DATA_ROOT
 from covidactnow.datapublic import common_test_helpers
-import requests_mock
+
+# turns all warnings into errors for this module
+pytestmark = pytest.mark.filterwarnings("error")
 
 
 def test_update_nytimes_virgin_islands():
