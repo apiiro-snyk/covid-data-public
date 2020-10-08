@@ -113,6 +113,9 @@ COUNTY_BACKFILLED_CASES = [
     ("48493", "2020-09-21", 307),  # Wilson County, TX
     ("48507", "2020-09-21", 52),  # Zavala County, TX
     ("48407", "2020-09-22", 1),  # San Jacinto, TX
+    # https://trello.com/c/GKUHUbyK/483-2020-10-03-collin-county-tx-spike-on-daily-new-cases
+    ("48201", "2020-10-02", 2438),  # Harris County, TX
+    ("48085", "2020-10-03", 1202),  # Collin County, TX
 ]
 
 
