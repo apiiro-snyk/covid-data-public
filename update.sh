@@ -13,7 +13,7 @@ python scripts/update_texas_tsa_hospitalizations.py || echo "Failed to update Te
 python scripts/update_texas_fips_hospitalizations.py
 python scripts/update_covid_data_scraper.py
 python scripts/update_forecast_hub.py
-
 python scripts/update_covid_county_data.py
 # AWS Lake seems to be hanging the build right now.
 # python scripts/update_aws_lake.py --replace-local-mirror --cleanup-local-mirror
+python scripts/update_hhs_testing_data.py

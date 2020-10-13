@@ -1,8 +1,10 @@
+import datetime
 import pathlib
 import re
 from typing import MutableMapping
 
 import pandas as pd
+import pytz
 
 
 UNEXPECTED_COLUMNS_MESSAGE = "DataFrame columns do not match expected fields"
@@ -54,3 +56,10 @@ def load_census_state(census_state_path: pathlib.Path) -> pd.DataFrame:
 def extract_state_fips(fips: str) -> str:
     """Extracts the state FIPS code from a county or state FIPS code."""
     return fips[:2]
+
+
+def version_timestamp():
+    """Returns a Pacific timezone timestamp for use in version.txt files."""
+    pacific = pytz.timezone("US/Pacific")
+    d = datetime.datetime.now(pacific)
+    return d.strftime("%A %b %d %I:%M:%S %p %Z")
