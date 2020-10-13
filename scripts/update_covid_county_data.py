@@ -204,6 +204,12 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
         is_fl_state = df[CommonFields.FIPS] == "12"
         df.loc[is_fl_state & is_incorrect_fl_icu_dates, CommonFields.CURRENT_ICU] = None
 
+        # Work around for https://github.com/valorumdata/cmdc-tools/issues/131
+        ancient_rows = df[CommonFields.DATE] < "2019-12-01"
+        if ancient_rows.any():
+            self.log.info("Dropping rows of ancient data", bad_rows=str(df.loc[ancient_rows]))
+            df = df.loc[~ancient_rows]
+
         df = df.set_index(COMMON_FIELDS_TIMESERIES_KEYS, verify_integrity=True)
 
         return df
