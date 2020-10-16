@@ -1,3 +1,4 @@
+import datetime
 import enum
 from typing import Union, Optional
 import os
@@ -21,6 +22,10 @@ import covidcountydata
 from scripts import update_nytimes_data
 
 DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
+
+
+class StaleDataError(Exception):
+    pass
 
 
 # Keep in sync with COMMON_FIELD_MAP in covid_county_data.py in the covid-data-model repo.
@@ -110,6 +115,11 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
 
         client.covid_us()
         df = client.fetch()
+
+        latest_dt = df[Fields.DT].max()
+        if latest_dt < datetime.date.today() - datetime.timedelta(days=3):
+            raise StaleDataError(f"Latest dt is {latest_dt}")
+
         # Transform FIPS from an int64 to a string of 2 or 5 chars. See
         # https://github.com/valorumdata/covid_county_data.py/issues/3
         df[CommonFields.FIPS] = df[Fields.LOCATION].apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")
@@ -221,8 +231,11 @@ if __name__ == "__main__":
     transformer = CovidCountyDataTransformer.make_with_data_root(
         DATA_ROOT, os.environ.get("CMDC_API_KEY", None), log,
     )
-    common_df.write_csv(
-        common_df.only_common_columns(transformer.transform(), log),
-        DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
-        log,
-    )
+    try:
+        common_df.write_csv(
+            common_df.only_common_columns(transformer.transform(), log),
+            DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
+            log,
+        )
+    except Exception:
+        log.exception("Update likely failed")
