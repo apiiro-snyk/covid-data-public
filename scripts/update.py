@@ -68,7 +68,8 @@ class CovidDatasetAutoUpdater(DatasetUpdaterBase):
             log.write("Updated on {}".format(self._stamp()))
 
     def update_all_data_files(self):
-        self.update_cds_data()
+        # TODO(michael): Temporarily disable to unblock data update.
+        # self.update_cds_data()
         self.update_jhu_data()
 
 
