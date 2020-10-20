@@ -1,7 +1,10 @@
+import io
 from io import StringIO
 import pandas as pd
+import numpy as np
 import pytest
 import temppathlib
+from datetime import date
 from more_itertools import one
 
 from covidactnow.datapublic import common_df
@@ -213,3 +216,33 @@ def test_remove_index_column():
         assert "fips,date,cases\n99,2020-04-01,123\n" == tmp.file.read()
 
     assert [l["event"] for l in logs] == ["Dropping column named 'index'", "Writing DataFrame"]
+
+
+def test_get_timeseries():
+    df = common_df.read_csv(
+        StringIO(
+            "fips,date,cases,total_tests\n" "06045,2020-04-01,234,\n" "45123,2020-04-02,456,\n"
+        )
+    )
+
+    EMPTY_TS = pd.Series([], dtype="float64")
+
+    # Check getting by CommonFields.CASES and literal str
+    expected_index = pd.MultiIndex.from_tuples(
+        [("06045", date(2020, 4, 1)), ("45123", date(2020, 4, 2))], names=["fips", "date"]
+    )
+    expected_ts = pd.Series([234, 456], name="cases", index=expected_index)
+    pd.testing.assert_series_equal(
+        common_df.get_timeseries(df, CommonFields.CASES, EMPTY_TS), expected_ts
+    )
+    pd.testing.assert_series_equal(common_df.get_timeseries(df, "cases", EMPTY_TS), expected_ts)
+
+    # Check that getting a metric with doesn't have any real values does not return EMPTY_TS.
+    expected_ts = pd.Series([np.nan, np.nan], name=CommonFields.TOTAL_TESTS, index=expected_index)
+    pd.testing.assert_series_equal(
+        common_df.get_timeseries(df, CommonFields.TOTAL_TESTS, EMPTY_TS), expected_ts
+    )
+
+    # Check that getting a metric that isn't found returns EMPTY_TS
+    assert common_df.get_timeseries(df, CommonFields.DEATHS, EMPTY_TS) is EMPTY_TS
+    assert common_df.get_timeseries(df, "deaths", EMPTY_TS) is EMPTY_TS

@@ -11,6 +11,7 @@ from structlog import stdlib
 
 from covidactnow.datapublic.common_fields import (
     CommonFields,
+    FieldName,
     COMMON_FIELDS_ORDER_MAP,
     COMMON_FIELDS_TIMESERIES_KEYS,
 )
@@ -115,3 +116,11 @@ def sort_common_field_columns(df: pd.DataFrame) -> pd.DataFrame:
         for i, col in enumerate(sorted(df.columns))
     }
     return df.loc[:, sorted(df.columns, key=lambda c: this_columns_order[c])]
+
+
+def get_timeseries(data: pd.DataFrame, field: FieldName, default: pd.Series) -> pd.Series:
+    """Similar to DataFrame.get but avoids TypeError because `field` is not a `str`."""
+    if field in data.columns:
+        return data[field]
+    else:
+        return default
