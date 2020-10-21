@@ -1,2 +1,2 @@
-Updated on 2020-10-20T11:49:51.839092
-Using forecast from 2020-10-12
+Updated on 2020-10-21T01:23:58.962297
+Using forecast from 2020-10-19
