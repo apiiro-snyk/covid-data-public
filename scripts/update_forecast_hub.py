@@ -10,7 +10,6 @@ import pydantic
 import datetime
 
 import zoltpy.util
-from zoltpy.cdc_io import YYYY_MM_DD_DATE_FORMAT
 
 from covidactnow.datapublic import common_init, common_df
 from scripts import helpers
@@ -172,6 +171,9 @@ class ForecastHubUpdater(pydantic.BaseModel):
         # Mangling the column names into f"weekly_new_{cases/deaths}_{quantile}". This
         # would be a good candidate to handle in long/tidy-form and we could remove both pivots.
         # Using common_field because this is done after helpers.rename_fields
+
+        # TODO(michael): Not sure why pylint is confused about the common_field member not existing.
+        # pylint: disable=no-member
         wide_df = data.set_index(
             [
                 Fields.REGION.common_field,

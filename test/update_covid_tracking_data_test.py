@@ -8,7 +8,6 @@ from covidactnow.datapublic import common_df
 from covidactnow.datapublic.common_fields import CommonFields
 from covidactnow.datapublic.common_test_helpers import to_dict
 
-from scripts import update_covid_data_scraper
 from scripts import update_covid_tracking_data
 
 from scripts.helpers import UNEXPECTED_COLUMNS_MESSAGE

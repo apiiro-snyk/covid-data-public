@@ -3,17 +3,31 @@ name: Python Unit Tests
 on: [push]
 
 jobs:
-  code-formatting-linting:
+  code-formatting-linting-tests:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: [3.7]
     steps:
     - name: Checkout covid-data-public
       uses: actions/checkout@v2
-    - name: Run Black
-      uses: RojerGS/python-black-check@1.0.1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
       with:
-        # This black github action specifies a default line-length instead of
-        # relying on the pyproject.toml file.  If you're suddenly getting a lot
-        # of black errors, maybe the line-length changed in pyproject.toml and
-        # the below value is out of date?
-        line-length: '100'
+        python-version: ${{ matrix.python-version }}
+    - name: Cache Pip
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt -r requirements_test.txt
+    - name: Check black formatting.
+      run: black --check .
+    - name: Test with pytest
+      run: make test

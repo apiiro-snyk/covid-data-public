@@ -21,7 +21,6 @@ from covidactnow.datapublic.common_fields import (
     COMMON_FIELDS_TIMESERIES_KEYS,
     FieldNameAndCommonField,
 )
-from scripts.update_covid_data_scraper import FieldNameAndCommonField
 from scripts import helpers
 
 DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
