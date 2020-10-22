@@ -18,9 +18,6 @@ logger = logging.Logger("data update logger")
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-cds", "--cds", help="Update data from the Corona Data Scraper", action="store_true"
-)
-parser.add_argument(
     "-jhu", "--jhu", help="Update data from John Hopkins University", action="store_true"
 )
 args = parser.parse_args()
@@ -33,9 +30,6 @@ class CovidDatasetAutoUpdater(DatasetUpdaterBase):
     _DATA_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "data"))
     _JHU_DATA_DIR = os.path.join(_DATA_DIR, "cases-jhu")
     _JHU_DAILY_REPORTS_DIR = os.path.join(_JHU_DATA_DIR, "csse_covid_19_daily_reports")
-
-    _CDS_TIMESERIES = r"https://coronadatascraper.com/timeseries.csv.zip"
-    _CDS_DATA_DIR = os.path.join(_DATA_DIR, "cases-cds")
 
     def _get_jhu_repo_url(self, git_sha: str) -> str:
         return f"https://github.com/CSSEGISandData/COVID-19/archive/{git_sha}.zip"
@@ -59,17 +53,7 @@ class CovidDatasetAutoUpdater(DatasetUpdaterBase):
                     os.path.join(self._JHU_DAILY_REPORTS_DIR, f),
                 )
 
-    def update_cds_data(self):
-        pd.read_csv(self._CDS_TIMESERIES).to_csv(
-            os.path.join(self._CDS_DATA_DIR, "timeseries.csv"), index=False
-        )
-        # Record the date and time of update in versions.txt
-        with open(os.path.join(self._CDS_DATA_DIR, "version.txt"), "w") as log:
-            log.write("Updated on {}".format(self._stamp()))
-
     def update_all_data_files(self):
-        # TODO(michael): Temporarily disable to unblock data update.
-        # self.update_cds_data()
         self.update_jhu_data()
 
 
@@ -77,11 +61,6 @@ if __name__ == "__main__":
     configure_logging()
     update = CovidDatasetAutoUpdater()
     something_specified = False
-
-    if args.cds:
-        logger.info("Updating data from the Corona Data Scraper")
-        update.update_cds_data()
-        something_specified = True
 
     if args.jhu:
         logger.info("Updating data from John Hopkins University")
