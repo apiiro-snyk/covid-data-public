@@ -45,6 +45,8 @@ STATE_BACKFILLED_CASES = [
     ("04", "2020-09-18", 764),
     # https://trello.com/c/9EbBRV1Z/472-2020-09-26-north-carolina-change-in-methodology-to-count-cases
     ("37", "2020-09-25", 4544),
+    # https://www.al.com/news/2020/10/alabama-adds-3852-covid-cases-after-influx-of-backlogged-data-dating-back-to-june.html
+    ("01", "2020-10-23", 2565),
 ]
 
 
