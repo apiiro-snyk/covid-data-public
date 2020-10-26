@@ -3,3 +3,5 @@ data/aws-lake/** filter=lfs diff=lfs merge=lfs -text
 data/cases-covid-county-data/timeseries-common.csv filter=lfs diff=lfs merge=lfs -text
 data/covid-tracking/*.csv filter=lfs diff=lfs merge=lfs -text
 data/covid-tracking/*.json filter=lfs diff=lfs merge=lfs -text
+data/testing-cms/archive/** filter=lfs diff=lfs merge=lfs -text
+data/testing-cms/timeseries-common.csv filter=lfs diff=lfs merge=lfs -text
