@@ -5,7 +5,7 @@ from typing import Optional
 
 import sentry_sdk
 import structlog
-from structlog_sentry import SentryProcessor
+from structlog_sentry import SentryJsonProcessor
 
 
 # env variable holding the Sentry Environment name
@@ -37,8 +37,11 @@ def configure_logging(command: Optional[str] = None):
         processors=[
             structlog.stdlib.add_log_level,  # required before SentryProcessor()
             # sentry_sdk creates events for level >= ERROR. Getting breadcrumbs from structlog isn't supported
-            # without a lot of custom work. See https://github.com/kiwicom/structlog-sentry/issues/25
-            SentryProcessor(level=logging.ERROR),
+            # without a lot of custom work. See https://github.com/kiwicom/structlog-sentry/issues/25.
+            # The SentryJsonProcessor is used to protect against event duplication.
+            # It adds loggers to a sentry_sdk ignore list, making sure that the message logged is
+            # not reported in addition to the exception stack trace.
+            SentryJsonProcessor(level=logging.ERROR, tag_keys="__all__"),
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
@@ -68,7 +71,7 @@ def configure_logging(command: Optional[str] = None):
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.INFO)
 
-    # Finally initialize sentry_sdk.
+    # Initialize sentry_sdk.
     sentry_dsn = os.getenv("SENTRY_DSN")
     sentry_environment = None
     if SENTRY_ENVIRONMENT_ENV in os.environ:
