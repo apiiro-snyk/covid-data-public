@@ -1,7 +1,9 @@
+import freezegun
 import pytest
 import structlog
 from more_itertools import one
 
+from scripts import update_covid_county_data
 from scripts.update_covid_county_data import CovidCountyDataTransformer, DATA_ROOT
 import requests_mock
 
@@ -19,7 +21,7 @@ SWAGGER_JSON_PATH = "test/data/api.covidcountydata.org_swagger.json"
 # Fetched with:
 # curl -H "Accept: text/csv" https://api.covidcountydata.org/covid_us > test/data/api.covidcountydata.org_covid_us_all_csv
 # Dates and locations picked to get coverage of all the variables:
-# cat test/data/api.covidcountydata.org_covid_us_all_csv | csvgrep -c location -r '\A(48347|34002|34001|6025|26121|21|42009|19017)\Z' | csvgrep -c dt -r '(2020-06-13|2020-08-07|2020-08-10)' > test/data/api.covidcountydata.org_covid_us_csv
+# cat test/data/api.covidcountydata.org_covid_us_all_csv | csvgrep -c location -r '\A(48347|34002|34001|6025|26121|21|42009|19017|47)\Z' | csvgrep -c dt -r '(2020-06-13|2020-07-05|2020-10-07|2020-10-10)' > test/data/api.covidcountydata.org_covid_us_csv
 COVID_US_URL = "https://api.covidcountydata.org/covid_us"
 COVID_US_PATH = "test/data/api.covidcountydata.org_covid_us_csv"
 
@@ -28,6 +30,7 @@ COVID_US_PATH = "test/data/api.covidcountydata.org_covid_us_csv"
 TEST_APIKEY = "covidactnow-local-test-key"
 
 
+@freezegun.freeze_time("2020-10-11")
 def test_update_covid_county_data_basic():
     with structlog.testing.capture_logs() as logs, requests_mock.Mocker() as m:
         m.get(SWAGGER_JSON_URL, text=open(SWAGGER_JSON_PATH).read())
@@ -40,10 +43,24 @@ def test_update_covid_county_data_basic():
     assert logs == []
 
 
+@freezegun.freeze_time("2020-10-15")
+def test_update_covid_county_data_basic_stale():
+    """Uses freezegun to make sure the transformer raises an exception when it reads stale data."""
+    with structlog.testing.capture_logs() as logs, requests_mock.Mocker() as m:
+        m.get(SWAGGER_JSON_URL, text=open(SWAGGER_JSON_PATH).read())
+        m.get(COVID_US_URL, text=open(COVID_US_PATH).read())
+        transformer = CovidCountyDataTransformer.make_with_data_root(
+            DATA_ROOT, TEST_APIKEY, structlog.get_logger()
+        )
+        with pytest.raises(update_covid_county_data.StaleDataError):
+            transformer.transform()
+
+
+@freezegun.freeze_time("2020-10-11")
 def test_update_covid_county_data_renamed_field():
     with structlog.testing.capture_logs() as logs, requests_mock.Mocker() as m:
         m.get(SWAGGER_JSON_URL, text=open(SWAGGER_JSON_PATH).read())
-        covid_csv = open(COVID_US_PATH).read().replace("hospital_beds_in_use_any", "foobar")
+        covid_csv = open(COVID_US_PATH).read().replace("hospital_beds_in_use_covid_total", "foobar")
         m.get(COVID_US_URL, text=covid_csv)
         transformer = CovidCountyDataTransformer.make_with_data_root(
             DATA_ROOT, TEST_APIKEY, structlog.get_logger()
@@ -52,10 +69,11 @@ def test_update_covid_county_data_renamed_field():
     assert not df.empty
     log_entry = one(logs)
     assert log_entry["event"] == UNEXPECTED_COLUMNS_MESSAGE
-    assert log_entry["missing_fields"] == {"hospital_beds_in_use_any"}
+    assert log_entry["missing_fields"] == {"hospital_beds_in_use_covid_total"}
     assert log_entry["extra_fields"] == {"foobar"}
 
 
+@freezegun.freeze_time("2020-08-11")
 def test_update_covid_county_data_bad_fips():
     with structlog.testing.capture_logs() as logs, requests_mock.Mocker() as m:
         m.get(SWAGGER_JSON_URL, text=open(SWAGGER_JSON_PATH).read())
@@ -71,6 +89,7 @@ def test_update_covid_county_data_bad_fips():
     assert log_entry["bad_fips"] == ["31337"]
 
 
+@freezegun.freeze_time("2020-08-11")
 def test_update_covid_county_data_drop_empty_state():
     with structlog.testing.capture_logs() as logs, requests_mock.Mocker() as m:
         m.get(SWAGGER_JSON_URL, text=open(SWAGGER_JSON_PATH).read())
@@ -83,4 +102,4 @@ def test_update_covid_county_data_drop_empty_state():
     assert not df.empty
     log_entry = one(logs)
     assert log_entry["event"] == "Dropping rows with null in important columns"
-    assert "2 rows" in log_entry["bad_rows"]
+    assert "4 rows" in log_entry["bad_rows"]

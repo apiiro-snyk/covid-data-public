@@ -1,5 +1,7 @@
+import dataclasses
 import datetime
 import enum
+from typing import Tuple
 from typing import Union, Optional
 import os
 import pathlib
@@ -79,7 +81,8 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     VENTILATORS_IN_USE_COVID_SUSPECTED = "ventilators_in_use_covid_suspected", None
 
 
-class CovidCountyDataTransformer(pydantic.BaseModel):
+@dataclasses.dataclass
+class CovidCountyDataTransformer:
     """Get the newest data from Valorum / Covid Modeling Data Collaborative and return a DataFrame
     of timeseries."""
 
@@ -93,9 +96,6 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
     county_fips_csv: pathlib.Path
 
     log: Union[structlog.BoundLoggerBase, BoundLoggerLazyProxy]
-
-    class Config:
-        arbitrary_types_allowed = True
 
     @staticmethod
     def make_with_data_root(
@@ -116,45 +116,16 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
         client.covid_us()
         df = client.fetch()
 
-        latest_dt = df[Fields.DT].max()
-        if latest_dt < datetime.date.today() - datetime.timedelta(days=3):
-            raise StaleDataError(f"Latest dt is {latest_dt}")
+        _fail_if_no_recent_dates(df[Fields.DT])
 
-        # Transform FIPS from an int64 to a string of 2 or 5 chars. See
-        # https://github.com/valorumdata/covid_county_data.py/issues/3
-        df[CommonFields.FIPS] = df[Fields.LOCATION].apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")
+        df[CommonFields.FIPS] = _fips_from_int(df[Fields.LOCATION])
 
         # Already transformed from Fields to CommonFields
         already_transformed_fields = {CommonFields.FIPS}
 
         df = helpers.rename_fields(df, Fields, already_transformed_fields, self.log)
 
-        df[CommonFields.COUNTRY] = "USA"
-
-        # Partition df by region type so states and counties can by merged with different
-        # data to get their names.
-        state_mask = df[CommonFields.FIPS].str.len() == 2
-        states = df.loc[state_mask, :]
-        counties = df.loc[~state_mask, :]
-
-        fips_data = helpers.load_county_fips_data(self.county_fips_csv).set_index(
-            [CommonFields.FIPS]
-        )
-        counties = counties.merge(
-            fips_data[[CommonFields.STATE, CommonFields.COUNTY]],
-            left_on=[CommonFields.FIPS],
-            suffixes=(False, False),
-            how="left",
-            right_index=True,
-        )
-        no_match_counties_mask = counties.state.isna()
-        if no_match_counties_mask.sum() > 0:
-            self.log.warning(
-                "Some counties did not match by fips",
-                bad_fips=counties.loc[no_match_counties_mask, CommonFields.FIPS].unique().tolist(),
-            )
-        counties = counties.loc[~no_match_counties_mask, :]
-        counties[CommonFields.AGGREGATE_LEVEL] = "county"
+        counties, states = self._counties_states_with_geoattributes(df)
 
         # TX county data is shifted forward one day.
         # it's possible that more regions are also shifted, see
@@ -174,16 +145,6 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
         backfilled_cases = update_nytimes_data.COUNTY_BACKFILLED_CASES
         counties = update_nytimes_data.remove_county_backfilled_cases(counties, backfilled_cases)
 
-        state_df = helpers.load_census_state(self.census_state_path).set_index(CommonFields.FIPS)
-        states = states.merge(
-            state_df[[CommonFields.STATE]],
-            left_on=[CommonFields.FIPS],
-            suffixes=(False, False),
-            how="left",
-            right_index=True,
-        )
-        states[CommonFields.AGGREGATE_LEVEL] = "state"
-
         # State level bed data is coming from HHS which tend to not match
         # numbers we're seeing from Covid Care Map.
         state_columns_to_drop = [
@@ -195,9 +156,19 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
         states = states.drop(state_columns_to_drop, axis="columns")
 
         df = pd.concat([states, counties])
-
         df = common_df.sort_common_field_columns(df)
+        df = self._drop_bad_rows(df)
 
+        # Removing a string of misleading FL current_icu values.
+        is_incorrect_fl_icu_dates = df[CommonFields.DATE].between("2020-05-14", "2020-05-20")
+        is_fl_state = df[CommonFields.FIPS] == "12"
+        df.loc[is_fl_state & is_incorrect_fl_icu_dates, CommonFields.CURRENT_ICU] = None
+
+        df = df.set_index(COMMON_FIELDS_TIMESERIES_KEYS, verify_integrity=True)
+
+        return df
+
+    def _drop_bad_rows(self, df):
         bad_rows = (
             df[CommonFields.FIPS].isnull()
             | df[CommonFields.DATE].isnull()
@@ -208,21 +179,72 @@ class CovidCountyDataTransformer(pydantic.BaseModel):
                 "Dropping rows with null in important columns", bad_rows=str(df.loc[bad_rows])
             )
             df = df.loc[~bad_rows]
-
-        # Removing a string of misleading FL current_icu values.
-        is_incorrect_fl_icu_dates = df[CommonFields.DATE].between("2020-05-14", "2020-05-20")
-        is_fl_state = df[CommonFields.FIPS] == "12"
-        df.loc[is_fl_state & is_incorrect_fl_icu_dates, CommonFields.CURRENT_ICU] = None
-
         # Work around for https://github.com/valorumdata/cmdc-tools/issues/131
         ancient_rows = df[CommonFields.DATE] < "2019-12-01"
         if ancient_rows.any():
             self.log.info("Dropping rows of ancient data", bad_rows=str(df.loc[ancient_rows]))
             df = df.loc[~ancient_rows]
-
-        df = df.set_index(COMMON_FIELDS_TIMESERIES_KEYS, verify_integrity=True)
-
         return df
+
+    def _counties_states_with_geoattributes(
+        self, df: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Split a DataFrame into using FIPS length, then join with geo attributes loaded from other data files.
+
+        Returns:
+            counties and states DataFrame objects
+        """
+        df[CommonFields.COUNTRY] = "USA"
+        # Partition df by region type so states and counties can by merged with different
+        # data to get their names.
+        state_mask = df[CommonFields.FIPS].str.len() == 2
+        states = df.loc[state_mask, :]
+        counties = df.loc[~state_mask, :]
+        fips_data = helpers.load_county_fips_data(self.county_fips_csv).set_index(
+            [CommonFields.FIPS]
+        )
+        counties = counties.merge(
+            fips_data[[CommonFields.STATE, CommonFields.COUNTY]],
+            left_on=[CommonFields.FIPS],
+            suffixes=(False, False),
+            how="left",
+            right_index=True,
+        )
+        no_match_counties_mask = counties.state.isna()
+        if no_match_counties_mask.sum() > 0:
+            self.log.warning(
+                "Some counties did not match by fips",
+                bad_fips=counties.loc[no_match_counties_mask, CommonFields.FIPS].unique().tolist(),
+            )
+        counties = counties.loc[~no_match_counties_mask, :]
+        counties[CommonFields.AGGREGATE_LEVEL] = "county"
+
+        state_df = helpers.load_census_state(self.census_state_path).set_index(CommonFields.FIPS)
+        states = states.merge(
+            state_df[[CommonFields.STATE]],
+            left_on=[CommonFields.FIPS],
+            suffixes=(False, False),
+            how="left",
+            right_index=True,
+        )
+        states[CommonFields.AGGREGATE_LEVEL] = "state"
+
+        return counties, states
+
+
+def _fail_if_no_recent_dates(dates: pd.Series):
+    """Raise an execption if there are no recent dates in Series"""
+    latest_dt = dates.max()
+    if latest_dt < datetime.date.today() - datetime.timedelta(days=3):
+        raise StaleDataError(f"Latest dt is {latest_dt}")
+
+
+def _fips_from_int(param):
+    """Transform FIPS from an int64 to a string of 2 or 5 chars.
+
+    See https://github.com/valorumdata/covid_county_data.py/issues/3
+    """
+    return param.apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")
 
 
 if __name__ == "__main__":
