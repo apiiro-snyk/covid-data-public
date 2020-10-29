@@ -5,6 +5,8 @@ from typing import Tuple
 from typing import Union, Optional
 import os
 import pathlib
+
+import click
 import pandas as pd
 
 import structlog
@@ -79,6 +81,16 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     )
     VENTILATORS_IN_USE_COVID_CONFIRMED = "ventilators_in_use_covid_confirmed", None
     VENTILATORS_IN_USE_COVID_SUSPECTED = "ventilators_in_use_covid_suspected", None
+
+
+# Keep in sync with COMMON_FIELD_MAP in covid-data-model repo.
+@enum.unique
+class UsaFactsFields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
+    FIPS = "fips", None  # Special transformation
+    DT = "dt", CommonFields.DATE
+
+    CASES_TOTAL = "cases_total", CommonFields.CASES
+    DEATHS_TOTAL = "deaths_total", CommonFields.DEATHS
 
 
 @dataclasses.dataclass
@@ -168,6 +180,31 @@ class CovidCountyDataTransformer:
 
         return df
 
+    def transform_usafacts(self) -> pd.DataFrame:
+        client = covidcountydata.Client(apikey=self.covid_county_data_key)
+
+        client.usafacts_covid()
+        df = client.fetch()
+
+        _fail_if_no_recent_dates(df[UsaFactsFields.DT])
+
+        df[CommonFields.FIPS] = _fips_from_int(df[UsaFactsFields.FIPS])
+
+        # Already transformed from Fields to CommonFields
+        already_transformed_fields = {CommonFields.FIPS}
+
+        df = helpers.rename_fields(df, UsaFactsFields, already_transformed_fields, self.log)
+
+        counties, states = self._counties_states_with_geoattributes(df)
+
+        df = pd.concat([states, counties])
+        df = common_df.sort_common_field_columns(df)
+        df = self._drop_bad_rows(df)
+
+        df = df.set_index(COMMON_FIELDS_TIMESERIES_KEYS, verify_integrity=True)
+
+        return df
+
     def _drop_bad_rows(self, df):
         bad_rows = (
             df[CommonFields.FIPS].isnull()
@@ -247,17 +284,36 @@ def _fips_from_int(param):
     return param.apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")
 
 
-if __name__ == "__main__":
+@click.command()
+@click.option("--fetch-covid-us/--no-fetch-covid-us", default=True)
+@click.option("--fetch-usafacts-covid/--no-fetch-usafacts-covid", default=True)
+def main(fetch_covid_us: bool, fetch_usafacts_covid: bool):
     common_init.configure_logging()
     log = structlog.get_logger()
     transformer = CovidCountyDataTransformer.make_with_data_root(
         DATA_ROOT, os.environ.get("CMDC_API_KEY", None), log,
     )
-    try:
-        common_df.write_csv(
-            common_df.only_common_columns(transformer.transform(), log),
-            DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
-            log,
-        )
-    except Exception:
-        log.exception("Update likely failed")
+
+    if fetch_covid_us:
+        try:
+            common_df.write_csv(
+                common_df.only_common_columns(transformer.transform(), log),
+                DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
+                log,
+            )
+        except Exception:
+            log.exception("Covid county data update likely failed")
+
+    if fetch_usafacts_covid:
+        try:
+            common_df.write_csv(
+                common_df.only_common_columns(transformer.transform_usafacts(), log),
+                DATA_ROOT / "cases-covid-county-data" / "timeseries-usafacts.csv",
+                log,
+            )
+        except Exception:
+            log.exception("Valorum USA Facts update likely failed")
+
+
+if __name__ == "__main__":
+    main()  # pylint: disable=no-value-for-parameter
