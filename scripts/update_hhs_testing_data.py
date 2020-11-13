@@ -85,7 +85,9 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
 
     # TODO(michael): For now we are disabling CA, OR, and NE due to recent outlier data.
     # We can hopefully re-enable them once we have better outlier handling.
-    df = df[~df[CommonFields.STATE].isin(["CA", "OR", "NE"])]
+    # TODO(tom): HI disabled 2020-11-13 due to high test positivity. See
+    # https://covidactnow.slack.com/archives/C0182MKHWCR/p1605272171063100
+    df = df[~df[CommonFields.STATE].isin(["CA", "OR", "NE", "HI"])]
 
     df[CommonFields.COUNTRY] = "USA"
     df[CommonFields.AGGREGATE_LEVEL] = "state"
