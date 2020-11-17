@@ -60,6 +60,10 @@ _logger = structlog.getLogger()
 
 def update_datasets():
     ARCHIVE_DATASETS_PATH.mkdir(parents=True, exist_ok=True)
+    # Since we re-download all archive datasets every time, go ahead and delete anything we have
+    # in git, since we've seen errant ones appear and disappear before.
+    for file in ARCHIVE_DATASETS_PATH.iterdir():
+        file.unlink()
 
     _logger.info(
         "Fetching datasets archive html page",
