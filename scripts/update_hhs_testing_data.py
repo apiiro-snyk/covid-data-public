@@ -83,10 +83,6 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     already_transformed_fields = set()
     df = helpers.rename_fields(df, Fields, already_transformed_fields, _logger)
 
-    # TODO(michael): For now we are disabling CA, OR, and NE due to recent outlier data.
-    # We can hopefully re-enable them once we have better outlier handling.
-    df = df[~df[CommonFields.STATE].isin(["CA", "OR", "NE"])]
-
     df[CommonFields.COUNTRY] = "USA"
     df[CommonFields.AGGREGATE_LEVEL] = "state"
     return df
