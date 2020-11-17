@@ -10,7 +10,7 @@ env:
   # Used by python code that reports errors to sentry.
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_ENVIRONMENT: 'production'
-
+  GITHUB_TOKEN: ${{ secrets.CAN_ROBOT_PERSONAL_ACCESS_TOKEN }}
 jobs:
   update-source-data:
     runs-on: ubuntu-latest
