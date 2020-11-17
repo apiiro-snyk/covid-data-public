@@ -256,7 +256,9 @@ class NYTimesUpdater(pydantic.BaseModel):
     STATE_CSV_FILENAME = "us-states.csv"
     VERSION_FILENAME = "version.txt"
 
-    NYTIMES_MASTER_API_URL = "https://api.github.com/repos/nytimes/covid-19-data/branches/master"
+    NYTIMES_MASTER_API_URL_STATES = (
+        "https://api.github.com/repos/nytimes/covid-19-data/contents/us-states.csv"
+    )
     NYTIMES_RAW_BASE_URL = "https://raw.githubusercontent.com/nytimes/covid-19-data/master"
 
     raw_data_root: pathlib.Path
@@ -299,8 +301,10 @@ class NYTimesUpdater(pydantic.BaseModel):
         return self.raw_data_root / self.STATE_CSV_FILENAME
 
     def get_master_commit_sha(self) -> str:
-        r = requests.get(self.NYTIMES_MASTER_API_URL)
-        return r.json()["commit"]["sha"]
+        # Getting the master commit of the states file as the master URL may contain
+        # changes not applicable to the files we download.
+        r = requests.get(self.NYTIMES_MASTER_API_URL_STATES)
+        return r.json()["sha"]
 
     def write_version_file(self, git_sha) -> None:
         stamp = datetime.datetime.utcnow().isoformat()
@@ -308,6 +312,18 @@ class NYTimesUpdater(pydantic.BaseModel):
         with version_path.open("w+") as vf:
             vf.write(f"{git_sha}\n")
             vf.write(f"Updated on {stamp}")
+
+    def read_version_file_sha(self) -> str:
+        version_path = self.raw_data_root / "version.txt"
+        with version_path.open("r") as vf:
+            return vf.readline().rstrip("\n")
+
+    def is_new_data_available(self):
+        """Check to see if the sha for the data files have updated."""
+        current_sha = self.read_version_file_sha()
+
+        new_sha = self.get_master_commit_sha()
+        return current_sha != new_sha
 
     def update_source_data(self):
         git_sha = self.get_master_commit_sha()
@@ -357,7 +373,7 @@ class NYTimesUpdater(pydantic.BaseModel):
         no_fips = data[CommonFields.FIPS].isna()
         if no_fips.any():
             _logger.error(
-                "Rows without fips", no_fips=data.loc[no_fips, CommonFields.COUNTY].value_counts(),
+                "Rows without fips", no_fips=data.loc[no_fips, CommonFields.COUNTY].value_counts()
             )
             data = data.loc[~no_fips, :]
 
@@ -365,10 +381,18 @@ class NYTimesUpdater(pydantic.BaseModel):
 
 
 @click.command()
+@click.option("--check-for-new-data", is_flag=True)
 @click.option("--fetch/--no-fetch", default=True)
-def main(fetch: bool):
+def main(check_for_new_data: bool, fetch: bool):
     common_init.configure_logging()
     transformer = NYTimesUpdater.make_with_data_root(DATA_ROOT)
+
+    if check_for_new_data:
+        if not transformer.is_new_data_available():
+            raise Exception("No new data available")
+        _logger.info("New data available")
+        return
+
     if fetch:
         _logger.info("Fetching new data.")
         transformer.update_source_data()

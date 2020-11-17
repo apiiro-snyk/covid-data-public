@@ -1,0 +1,36 @@
+name: Triggers data update on new nytimes data.
+
+on:
+  schedule:
+    # cron format: minute hour day-of-month month day-of-week
+    - cron: '30 * * * *'
+  workflow_dispatch:
+
+env:
+  # Used by python code that reports errors to sentry.
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  SENTRY_ENVIRONMENT: 'production'
+
+jobs:
+  update-source-data:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7.6'
+        architecture: 'x64'
+    - name: Cache Pip
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+    - name: Trigger Update on New Data
+      run: tools/trigger-update-on-new-data.sh
