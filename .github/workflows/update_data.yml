@@ -54,9 +54,10 @@ jobs:
       uses: benc-uk/workflow-dispatch@v1
       with:
         token: ${{ secrets.CAN_ROBOT_PERSONAL_ACCESS_TOKEN }}
-        repository: covid-projections/covid-data-model
+        repo: covid-projections/covid-data-model
         workflow: 'Update combined datasets'
         inputs: '{ "trigger_api_build": "${{ env.TRIGGER_API_BUILD }}" }'
+        ref: 'master'
     - name: Slack notification
       if: always() # Pick up events even if the job fails or is canceled.
       env:
