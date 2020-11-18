@@ -23,7 +23,7 @@ execute () {
          -H "Accept: application/vnd.github.v3+json" \
          --request POST \
          --data "{ \"ref\": \"master\", \"inputs\": { \"trigger_api_build\": \"true\" } }" \
-      https://api.github.com/repos/covid-projections/covid-data-model/actions/workflows/update_repo_datasets.yml/dispatches
+      https://api.github.com/repos/covid-projections/covid-data-public/actions/workflows/update_data.yml/dispatches
 
     echo "Data sources update requested. Go to https://github.com/covid-projections/covid-data-public/actions to monitor progress."
   else

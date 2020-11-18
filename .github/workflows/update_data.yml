@@ -4,23 +4,17 @@ on:
   schedule:
     # cron format: minute hour day-of-month month day-of-week
     - cron: '45 0,11 * * *'
-  # Hook to trigger a manual run.
-  # See: https://goobar.io/2019/12/07/manually-trigger-a-github-actions-workflow/
-  # A sample request looks like:
-  # curl https://api.github.com/repos/covid-projections/covid-data-public/dispatches -H "Authorization: token $AUTH_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -X POST -d '{"event_type": "update-source-data"}'
-  repository_dispatch:
-    types: update-source-data
-# To debug, comment out above schedule, and uncomment the stanza below.
-# Fill in your own branch name, and each push will trigger a run
-#  push:
-#    branches:
-#    - <YOUR BRANCH HERE>
+  workflow_dispatch:
+    inputs:
+      trigger_api_build:
+        description: 'If "true" API snapshot build will be triggered after dataset update in covid-data-model.'
+        default: 'false'
 
 env:
   # Used by python code that reports errors to sentry.
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_ENVIRONMENT: 'production'
-
+  TRIGGER_API_BUILD: ${{ github.event.inputs.trigger_api_build }}
 
 jobs:
   update-source-data:
@@ -57,11 +51,12 @@ jobs:
     - name: Create Update Commit
       run: ./push_update.sh
     - name: Trigger Covid Data Model Dataset Update
-      uses: peter-evans/repository-dispatch@v1
+      uses: benc-uk/workflow-dispatch@v1
       with:
         token: ${{ secrets.CAN_ROBOT_PERSONAL_ACCESS_TOKEN }}
         repository: covid-projections/covid-data-model
-        event-type: update-dataset-snapshot
+        workflow: 'Update combined datasets'
+        inputs: '{ "trigger_api_build": "${{ env.TRIGGER_API_BUILD }}" }'
     - name: Slack notification
       if: always() # Pick up events even if the job fails or is canceled.
       env:
