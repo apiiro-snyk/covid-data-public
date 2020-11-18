@@ -6,7 +6,10 @@ python scripts/update.py
 python scripts/update_covid_tracking_data.py
 # TODO(brett): Change CCM to static file from 2018 Hospital Survey
 # python scripts/update_covid_care_map.py
-python scripts/update_nha_hospitalization_county.py
+
+# TODO(chris): Potentially remove NHA scraper (https://trello.com/c/MXlquRDc/600-remove-nha-scraper-in-covid-data-public)
+# python scripts/update_nha_hospitalization_county.py
+
 python scripts/update_nytimes_data.py
 python scripts/update_test_and_trace.py
 # TODO(https://trello.com/c/PeQXdUCU): Fix Texas hospitalizations.
