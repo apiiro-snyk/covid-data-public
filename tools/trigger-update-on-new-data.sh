@@ -1,5 +1,5 @@
 #!/bin/bash
-# trigger-update-on-new-data.sh - Check for new cases from NYTimes and runs update on success
+# trigger-update-on-new-data.sh - Check for new cases from NYTimes and runs update + API snapshot build on success.
 
 set -o nounset
 set -o errexit
@@ -20,9 +20,10 @@ execute () {
   if python scripts/update_nytimes_data.py --check-for-new-data
   then
     curl -H "Authorization: token $GITHUB_TOKEN" \
-        --request POST \
-        --data "{\"event_type\": \"update-source-data\" }" \
-        https://api.github.com/repos/covid-projections/covid-data-public/dispatches
+         -H "Accept: application/vnd.github.v3+json" \
+         --request POST \
+         --data "{ \"ref\": \"master\", \"inputs\": { \"trigger_api_build\": \"true\" } }" \
+      https://api.github.com/repos/covid-projections/covid-data-model/actions/workflows/update_repo_datasets.yml/dispatches
 
     echo "Data sources update requested. Go to https://github.com/covid-projections/covid-data-public/actions to monitor progress."
   else
