@@ -120,6 +120,10 @@ class PdFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
 
     PROVENANCE = "provenance"
 
+    # The name of the dataset. This was added to enable having multiple dataset in a
+    # single DataFrame while merging test positivity data sources.
+    DATASET = "dataset"
+
 
 # CommonFields used as keys/index columns in timeseries DataFrames.
 # I'd like this to be immutable (for example a tuple) but pandas sometimes treats tuples and lists
