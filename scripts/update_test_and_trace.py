@@ -1,16 +1,17 @@
 import csv
-import logging
 import pathlib
 import requests
+import structlog
 from pydantic import BaseModel, HttpUrl, DirectoryPath, FilePath
 from datetime import date
 import pandas as pd
 import re
+from covidactnow.datapublic import common_df
+from covidactnow.datapublic import common_init
+from scripts import helpers
 
 # Cam gave Tom this URL in a DM in https://testandtrace.slack.com/
 # The sheet name is "Data for CovidActNow"; I'm concerned that it isn't updated as part of their regular data push.
-from scripts import helpers
-
 SOURCE_URL = "https://docs.google.com/spreadsheets/d/11_o7IH6puGS7ftgq0m3-ATCvZylKepHV4hZX_axjBCg/export?format=csv"
 DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 
@@ -58,7 +59,7 @@ class TestAndTraceSyncer(BaseModel):
                     contact_tracers_count=contact_tracers_count,
                 )
 
-    def update(self):
+    def update(self, log):
         todays_filename = self.date_today.isoformat() + ".csv"
         todays_file_path = self.gsheets_copy_directory / todays_filename
         todays_file_path.write_bytes(requests.get(self.source_url).content)
@@ -67,15 +68,16 @@ class TestAndTraceSyncer(BaseModel):
             self.yield_dict_per_state_date(),
             columns=["fips", "state", "date", "contact_tracers_count"],
         ).sort_values(["fips", "date"])
-        result.to_csv(self.state_timeseries_path, index=False)
+        common_df.write_csv(result, self.state_timeseries_path, log)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    common_init.configure_logging()
+    log = structlog.get_logger(__name__)
     TestAndTraceSyncer(
         source_url=SOURCE_URL,
         census_state_path=DATA_ROOT / "misc" / "state.txt",
         gsheets_copy_directory=DATA_ROOT / "test-and-trace" / "gsheet-copy",
         state_timeseries_path=DATA_ROOT / "test-and-trace" / "state_data.csv",
         date_today=date.today(),
-    ).update()
+    ).update(log)
