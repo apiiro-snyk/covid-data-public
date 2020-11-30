@@ -2,7 +2,6 @@
 set -o nounset
 set -o errexit
 
-python scripts/update.py
 python scripts/update_covid_tracking_data.py
 # TODO(brett): Change CCM to static file from 2018 Hospital Survey
 # python scripts/update_covid_care_map.py
