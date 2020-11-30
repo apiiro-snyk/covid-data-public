@@ -295,24 +295,18 @@ def main(fetch_covid_us: bool, fetch_usafacts_covid: bool):
     )
 
     if fetch_covid_us:
-        try:
-            common_df.write_csv(
-                common_df.only_common_columns(transformer.transform(), log),
-                DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
-                log,
-            )
-        except Exception:
-            log.exception("Covid county data update likely failed")
+        common_df.write_csv(
+            common_df.only_common_columns(transformer.transform(), log),
+            DATA_ROOT / "cases-covid-county-data" / "timeseries-common.csv",
+            log,
+        )
 
     if fetch_usafacts_covid:
-        try:
-            common_df.write_csv(
-                common_df.only_common_columns(transformer.transform_usafacts(), log),
-                DATA_ROOT / "cases-covid-county-data" / "timeseries-usafacts.csv",
-                log,
-            )
-        except Exception:
-            log.exception("Valorum USA Facts update likely failed")
+        common_df.write_csv(
+            common_df.only_common_columns(transformer.transform_usafacts(), log),
+            DATA_ROOT / "cases-covid-county-data" / "timeseries-usafacts.csv",
+            log,
+        )
 
 
 if __name__ == "__main__":
