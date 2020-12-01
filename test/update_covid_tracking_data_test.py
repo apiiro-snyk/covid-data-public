@@ -1,20 +1,17 @@
 from io import StringIO
 
-import pandas as pd
 import pytest
 import structlog
 
 from covidactnow.datapublic import common_df
-from covidactnow.datapublic.common_fields import CommonFields
 from covidactnow.datapublic.common_test_helpers import to_dict
 
 from scripts import update_covid_tracking_data
 
-from scripts.helpers import UNEXPECTED_COLUMNS_MESSAGE
-
-# turns all warnings into errors for this module
+from scripts import helpers
 from scripts.update_covid_tracking_data import ICU_HOSPITALIZED_MISMATCH_WARNING_MESSAGE
 
+# turns all warnings into errors for this module
 pytestmark = pytest.mark.filterwarnings("error")
 
 
@@ -42,7 +39,7 @@ def test_transform():
     assert to_dict(["fips", "date"], out_df) == to_dict(["fips", "date"], expected_df)
 
     assert [l["event"] for l in logs] == [
-        UNEXPECTED_COLUMNS_MESSAGE,
+        helpers.MISSING_COLUMNS_MESSAGE,
     ]
 
 
@@ -71,5 +68,5 @@ def test_transform_icu_greater_than_hospitalized():
 
     assert [l["event"] for l in logs] == [
         ICU_HOSPITALIZED_MISMATCH_WARNING_MESSAGE,
-        UNEXPECTED_COLUMNS_MESSAGE,
+        helpers.MISSING_COLUMNS_MESSAGE,
     ]

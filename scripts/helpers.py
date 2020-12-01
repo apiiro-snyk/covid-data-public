@@ -2,12 +2,16 @@ import datetime
 import pathlib
 import re
 from typing import MutableMapping
+from typing import Set
+from typing import Type
 
 import pandas as pd
 import pytz
 
+from covidactnow.datapublic import common_fields
 
-UNEXPECTED_COLUMNS_MESSAGE = "DataFrame columns do not match expected fields"
+MISSING_COLUMNS_MESSAGE = "DataFrame is missing expected column(s)"
+EXTRA_COLUMNS_MESSAGE = "DataFrame has extra unexpected column(s)"
 
 
 def load_county_fips_data(fips_csv: pathlib.Path) -> pd.DataFrame:
@@ -16,22 +20,35 @@ def load_county_fips_data(fips_csv: pathlib.Path) -> pd.DataFrame:
     return df
 
 
-def rename_fields(df, fields, already_transformed_fields, log) -> pd.DataFrame:
-    """Return df with columns renamed according to fields, logging and dropping unexpected columns."""
-    extra_fields = set(df.columns) - set(fields) - already_transformed_fields
+def rename_fields(
+    df: pd.DataFrame,
+    fields: Type[common_fields.FieldNameAndCommonField],
+    already_transformed_fields: Set[str],
+    log,
+    *,
+    check_extra_fields=True,
+) -> pd.DataFrame:
+    """Return df with columns renamed to common_field names declared in `fields`.
+
+    Unexpected columns are logged. Extra fields are optionally logged and source to add the fields
+    to the enum is printed.
+    """
+    if check_extra_fields:
+        extra_fields = set(df.columns) - set(fields) - already_transformed_fields
+        if extra_fields:
+            # If this warning happens in a test check that the sample data in test/data
+            # has the same fields as the argument passed to `fields`.
+            log.warning(EXTRA_COLUMNS_MESSAGE, extra_fields=extra_fields)
+            print("-- Add the following lines to the appropriate Fields enum --")
+            for extra_field in extra_fields:
+                enum_name = re.sub(r"(?<!^)(?=[A-Z])", "_", extra_field).upper()
+                print(f'    {enum_name} = "{extra_field}", None')
+            print("-- end of suggested new Fields --")
     missing_fields = set(fields) - set(df.columns)
-    if extra_fields or missing_fields:
-        # If this warning happens in a test you may need to edit the sample data in test/data
-        # to make sure all the expected fields appear in the sample.
-        log.warning(
-            UNEXPECTED_COLUMNS_MESSAGE, extra_fields=extra_fields, missing_fields=missing_fields,
-        )
-    if extra_fields:
-        print("-- Add the following lines to the approriate Fields enum --")
-        for extra_field in extra_fields:
-            enum_name = re.sub(r"(?<!^)(?=[A-Z])", "_", extra_field).upper()
-            print(f'    {enum_name} = "{extra_field}", None')
-        print("-- end of suggested new Fields --")
+    if missing_fields:
+        # If this warning happens in a test check that the sample data in test/data
+        # has the same fields as the argument passed to `fields`.
+        log.warning(MISSING_COLUMNS_MESSAGE, missing_fields=missing_fields)
     rename: MutableMapping[str, str] = {f: f for f in already_transformed_fields}
     for col in df.columns:
         field = fields.get(col)
