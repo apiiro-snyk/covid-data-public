@@ -107,6 +107,8 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
     # Ratio of positive tests to total tests, from 0.0 to 1.0
     TEST_POSITIVITY = "test_positivity"
 
+    CAN_LOCATION_PAGE_URL = "can_location_page_url"
+
 
 @enum.unique
 class PdFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
