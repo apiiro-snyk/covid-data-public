@@ -65,7 +65,7 @@ def load_census_state(census_state_path: pathlib.Path) -> pd.DataFrame:
     # By default pandas will parse the numeric values in the STATE column as ints but FIPS are two character codes.
     state_df = pd.read_csv(census_state_path, delimiter="|", dtype={"STATE": str})
     state_df.rename(
-        columns={"STUSAB": "state", "STATE": "fips", "STATE_NAME": "state_name"}, inplace=True,
+        columns={"STUSAB": "state", "STATE": "fips", "STATE_NAME": "state_name"}, inplace=True
     )
     return state_df
 
@@ -80,3 +80,11 @@ def version_timestamp():
     pacific = pytz.timezone("US/Pacific")
     d = datetime.datetime.now(pacific)
     return d.strftime("%A %b %d %I:%M:%S %p %Z")
+
+
+def fips_from_int(param: pd.Series):
+    """Transform FIPS from an int64 to a string of 2 or 5 chars.
+
+    See https://github.com/valorumdata/covid_county_data.py/issues/3
+    """
+    return param.apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")

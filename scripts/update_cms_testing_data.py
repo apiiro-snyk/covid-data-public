@@ -104,7 +104,7 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     URBAN_RURAL = "NCHS Urban Rural Classification", None
     TESTS_14D = "Tests in prior 14 days", None
     TESTS_14D_NORMALIZED = "14-day test rate per 100,000 population", None
-    TEST_POSITIVITY = "Percent Positivity in prior 14 days", CommonFields.TEST_POSITIVITY
+    TEST_POSITIVITY = "Percent Positivity in prior 14 days", CommonFields.TEST_POSITIVITY_14D
     POSITIVITY_CLASSIFICATION = "Test Positivity Classification - 14 days", None
 
 
@@ -195,9 +195,7 @@ def main(replace_local_mirror: bool, generate_common_csv: bool):
         update_datasets()
 
     if generate_common_csv:
-        common_df.write_csv(
-            transform_cms_datasets(), TIMESERIES_CSV_PATH, _logger,
-        )
+        common_df.write_csv(transform_cms_datasets(), TIMESERIES_CSV_PATH, _logger)
 
 
 if __name__ == "__main__":

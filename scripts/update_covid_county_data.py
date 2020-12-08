@@ -68,10 +68,7 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     ICU_BEDS_IN_USE_COVID_CONFIRMED = "icu_beds_in_use_covid_confirmed", None
     ICU_BEDS_IN_USE_COVID_SUSPECTED = "icu_beds_in_use_covid_suspected", None
     ICU_BEDS_IN_USE_ANY = "icu_beds_in_use_any", CommonFields.CURRENT_ICU_TOTAL
-    ICU_BEDS_IN_USE_COVID_TOTAL = (
-        "icu_beds_in_use_covid_total",
-        CommonFields.CURRENT_ICU,
-    )
+    ICU_BEDS_IN_USE_COVID_TOTAL = ("icu_beds_in_use_covid_total", CommonFields.CURRENT_ICU)
 
     VENTILATORS_IN_USE_ANY = "ventilators_in_use_any", None
     VENTILATORS_CAPACITY_COUNT = "ventilators_capacity_count", None
@@ -130,7 +127,7 @@ class CovidCountyDataTransformer:
 
         _fail_if_no_recent_dates(df[Fields.DT])
 
-        df[CommonFields.FIPS] = _fips_from_int(df[Fields.LOCATION])
+        df[CommonFields.FIPS] = helpers.fips_from_int(df[Fields.LOCATION])
 
         # Already transformed from Fields to CommonFields
         already_transformed_fields = {CommonFields.FIPS}
@@ -188,7 +185,7 @@ class CovidCountyDataTransformer:
 
         _fail_if_no_recent_dates(df[UsaFactsFields.DT])
 
-        df[CommonFields.FIPS] = _fips_from_int(df[UsaFactsFields.FIPS])
+        df[CommonFields.FIPS] = helpers.fips_from_int(df[UsaFactsFields.FIPS])
 
         # Already transformed from Fields to CommonFields
         already_transformed_fields = {CommonFields.FIPS}
@@ -276,14 +273,6 @@ def _fail_if_no_recent_dates(dates: pd.Series):
         raise StaleDataError(f"Latest dt is {latest_dt}")
 
 
-def _fips_from_int(param):
-    """Transform FIPS from an int64 to a string of 2 or 5 chars.
-
-    See https://github.com/valorumdata/covid_county_data.py/issues/3
-    """
-    return param.apply(lambda v: f"{v:0>{2 if v < 100 else 5}}")
-
-
 @click.command()
 @click.option("--fetch-covid-us/--no-fetch-covid-us", default=True)
 @click.option("--fetch-usafacts-covid/--no-fetch-usafacts-covid", default=True)
@@ -291,7 +280,7 @@ def main(fetch_covid_us: bool, fetch_usafacts_covid: bool):
     common_init.configure_logging()
     log = structlog.get_logger()
     transformer = CovidCountyDataTransformer.make_with_data_root(
-        DATA_ROOT, os.environ.get("CMDC_API_KEY", None), log,
+        DATA_ROOT, os.environ.get("CMDC_API_KEY", None), log
     )
 
     if fetch_covid_us:
