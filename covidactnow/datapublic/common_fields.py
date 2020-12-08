@@ -106,6 +106,8 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
 
     # Ratio of positive tests to total tests, from 0.0 to 1.0
     TEST_POSITIVITY = "test_positivity"
+    TEST_POSITIVITY_14D = "test_positivity_14d"
+    TEST_POSITIVITY_7D = "test_positivity_7d"
 
     CAN_LOCATION_PAGE_URL = "can_location_page_url"
 
