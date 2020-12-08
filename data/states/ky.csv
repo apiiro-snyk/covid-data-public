@@ -1,14 +1,3 @@
-country,state,aggregate_level,fips,date,current_icu_total,ventilator_capacity,current_icu,current_ventilated
-USA,KY,state,21,2020-05-06,2621,1828,,58
-USA,KY,state,21,2020-05-07,2451,1813,136,59
-USA,KY,state,21,2020-05-08,2556,1819,150,57
-USA,KY,state,21,2020-05-09,2622,1821,147,59
-USA,KY,state,21,2020-05-10,2614,1826,148,61
-USA,KY,state,21,2020-05-11,2633,1826,102,49
-USA,KY,state,21,2020-05-12,2596,1808,113,63
-USA,KY,state,21,2020-05-13,2585,1809,119,56
-USA,KY,state,21,2020-05-14,2570,1815,97,58
-USA,KY,state,21,2020-05-15,2626,1812,96,51
-USA,KY,state,21,2020-05-16,2587,1805,92,46
-USA,KY,state,21,2020-05-17,,,,
-USA,KY,state,21,2020-05-18,2572,1981,103,51
+version https://git-lfs.github.com/spec/v1
+oid sha256:9573e678f7174ffe2a6e086a105d32cc2dcf2b23a40a94ed65c3ed2cc144f26c
+size 662
