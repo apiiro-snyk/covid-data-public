@@ -19,3 +19,4 @@ xlrd==1.2.0
 git+https://github.com/reichlab/zoltpy/@e1917d05510b833220cdac4a9dcf14cd010d0863
 pymmwr==0.2.2
 beautifulsoup4==4.9.3
+pyarrow==2.0.0
