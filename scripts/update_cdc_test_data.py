@@ -34,6 +34,31 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     VALUE = "value", None
 
 
+def _remove_trailing_zeros(series: pd.Series) -> pd.Series:
+
+    series = series.copy()
+
+    index = series.loc[series != 0].last_valid_index()
+
+    if index is None:
+        # If test positivity is 0% the entire time, considering the data inaccurate, returning
+        # none.
+        series[:] = None
+        return series
+
+    series[index + pd.DateOffset(1) :] = None
+    return series
+
+
+def remove_trailing_zeros(data: pd.DataFrame) -> pd.DataFrame:
+    data = data.sort_values([CommonFields.FIPS, CommonFields.DATE]).set_index(CommonFields.DATE)
+    test_pos = data.groupby(CommonFields.FIPS)[CommonFields.TEST_POSITIVITY_7D].apply(
+        _remove_trailing_zeros
+    )
+    data[CommonFields.TEST_POSITIVITY_7D] = test_pos
+    return data.reset_index()
+
+
 def update(data_url: str):
 
     all_df = pd.read_parquet(data_url)
@@ -69,7 +94,8 @@ def update(data_url: str):
         CommonFields.STATE: states,
     }
 
-    return pd.DataFrame(output_data)
+    data = pd.DataFrame(output_data)
+    return remove_trailing_zeros(data)
 
 
 if __name__ == "__main__":
