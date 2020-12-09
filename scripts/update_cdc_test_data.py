@@ -25,7 +25,7 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
     DATE = "dt", CommonFields.DATE
     # Special transformation to FIPS
     LOCATION = "location", None
-    CATEGORY = "category", None
+    VARIABLE_NAME = "variable_name", None
     MEASUREMENT = "measurement", None
     UNIT = "unit", None
     AGE = "age", None
@@ -65,7 +65,7 @@ def update(data_url: str):
 
     is_federal_test_positivity = (
         (all_df[Fields.PROVIDER] == "federal")
-        & (all_df[Fields.CATEGORY] == "pcr_tests_positive")
+        & (all_df[Fields.VARIABLE_NAME] == "pcr_tests_positive")
         & (all_df[Fields.MEASUREMENT] == "rolling_average_7_day")
         & (all_df[Fields.UNIT] == "percentage")
         & (all_df[Fields.AGE] == "all")

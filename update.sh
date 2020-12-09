@@ -16,6 +16,7 @@ python scripts/update_covid_county_data.py
 # AWS Lake seems to be hanging the build right now.
 # python scripts/update_aws_lake.py --replace-local-mirror --cleanup-local-mirror
 python scripts/update_hhs_testing_data.py
+python scripts/update_cdc_test_data.py
 # TODO(michael): Make this non-fatal once we have more trust and are relying on
 # this data.
 python scripts/update_cms_testing_data.py || echo "Failed to update CMS Test Positivity data."
