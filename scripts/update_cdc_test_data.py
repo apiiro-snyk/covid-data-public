@@ -64,7 +64,7 @@ def update(data_url: str):
     all_df = pd.read_parquet(data_url)
 
     is_federal_test_positivity = (
-        (all_df[Fields.PROVIDER] == "federal")
+        (all_df[Fields.PROVIDER] == "cdc")
         & (all_df[Fields.VARIABLE_NAME] == "pcr_tests_positive")
         & (all_df[Fields.MEASUREMENT] == "rolling_average_7_day")
         & (all_df[Fields.UNIT] == "percentage")
