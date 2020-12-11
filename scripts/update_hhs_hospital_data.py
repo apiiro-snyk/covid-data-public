@@ -29,6 +29,7 @@ CUSTOM_START_DATES = {
     "16": "2020-10-17",  # Idaho
     "19": "2020-09-05",  # Iowa
     "21": "2020-10-15",  # Kentucky
+    "28": "2020-11-11",  # Mississippi
     "34": "2020-09-01",  # New Jersey
     "38": "2020-11-03",  # North Dakota
     "46": "2020-11-02",  # South Dakota
@@ -122,7 +123,13 @@ def update(data_url: str):
     states_df[CommonFields.AGGREGATE_LEVEL] = "state"
 
     # Merge counties and states back together.
-    out_df = pd.concat([counties_df, states_df])
+    out_df = pd.concat(
+        [
+            # TODO(michael): Reincorporate county HHS hospital data once we've resolved the outstanding issues.
+            # counties_df,
+            states_df
+        ]
+    )
 
     # Add country metadata.
     out_df[CommonFields.COUNTRY] = "USA"
