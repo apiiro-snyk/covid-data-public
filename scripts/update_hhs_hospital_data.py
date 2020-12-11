@@ -25,6 +25,7 @@ _logger = structlog.getLogger()
 DEFAULT_START_DATE = "2020-09-01"
 CUSTOM_START_DATES = {
     "02": "2020-10-06",  # Alaska
+    "04": "2020-09-02",  # Arizona
     "15": "2020-10-10",  # Hawaii
     "16": "2020-10-17",  # Idaho
     "19": "2020-09-05",  # Iowa
