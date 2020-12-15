@@ -95,6 +95,12 @@ def update(data_url: str):
     }
 
     data = pd.DataFrame(output_data)
+
+    # Remove California data. Recent test positivity values were obviously broken starting Dec 15.
+    # Restore it once CDC fixes their data.
+    # See https://covidactnow.slack.com/archives/C0182MKHWCR/p1608047925064000?thread_ts=1608020222.062200&cid=C0182MKHWCR
+    data = data.loc[data[CommonFields.STATE] != "CA", :]
+
     return remove_trailing_zeros(data)
 
 
