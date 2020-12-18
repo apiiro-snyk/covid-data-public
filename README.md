@@ -3,6 +3,11 @@ Repository for regularly-updated data sets used by
 [covid-data-model](https://github.com/covid-projections/covid-data-model). Anything that we want to re-fetch periodically should definitely live in this repo, along with scripts for automated updating.
 
 ## Notes
+* We recently changed our default branch from `master` to `main`. If you have the repo checked out locally, you can update with the following:
+  ```bash
+  $ git branch --unset-upstream
+  $ git branch -u origin/main
+  ```
 * Use README.md files to document where data has been sourced from.
 * Data is updated twice daily (midnight and noon, UTC) by a Github Action defined [here](./.github/workflows/update_data.yml).
   The action runs [update.sh](./update.sh) and then [push_update.sh](./push_update.sh).

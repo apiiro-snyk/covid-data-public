@@ -22,7 +22,7 @@ execute () {
     curl -H "Authorization: token $GITHUB_TOKEN" \
          -H "Accept: application/vnd.github.v3+json" \
          --request POST \
-         --data "{ \"ref\": \"master\", \"inputs\": { \"trigger_api_build\": \"true\" } }" \
+         --data "{ \"ref\": \"main\", \"inputs\": { \"trigger_api_build\": \"true\" } }" \
       https://api.github.com/repos/covid-projections/covid-data-public/actions/workflows/update_data.yml/dispatches
 
     echo "Data sources update requested. Go to https://github.com/covid-projections/covid-data-public/actions to monitor progress."
