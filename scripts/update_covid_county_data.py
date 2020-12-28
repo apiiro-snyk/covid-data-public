@@ -183,7 +183,7 @@ class CovidCountyDataTransformer:
         client.usafacts_covid()
         df = client.fetch()
 
-        _fail_if_no_recent_dates(df[UsaFactsFields.DT])
+        _fail_if_no_recent_dates(df[UsaFactsFields.DT], stale_days_allowed=5)
 
         df[CommonFields.FIPS] = helpers.fips_from_int(df[UsaFactsFields.FIPS])
 
@@ -266,10 +266,10 @@ class CovidCountyDataTransformer:
         return counties, states
 
 
-def _fail_if_no_recent_dates(dates: pd.Series):
+def _fail_if_no_recent_dates(dates: pd.Series, stale_days_allowed=3):
     """Raise an execption if there are no recent dates in Series"""
     latest_dt = dates.max()
-    if latest_dt < datetime.date.today() - datetime.timedelta(days=3):
+    if latest_dt < datetime.date.today() - datetime.timedelta(days=stale_days_allowed):
         raise StaleDataError(f"Latest dt is {latest_dt}")
 
 
