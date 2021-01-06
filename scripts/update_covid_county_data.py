@@ -183,7 +183,7 @@ class CovidCountyDataTransformer:
         client.usafacts_covid()
         df = client.fetch()
 
-        _fail_if_no_recent_dates(df[UsaFactsFields.DT], stale_days_allowed=5)
+        _fail_if_no_recent_dates(df[UsaFactsFields.DT], stale_days_allowed=7)
 
         df[CommonFields.FIPS] = helpers.fips_from_int(df[UsaFactsFields.FIPS])
 
