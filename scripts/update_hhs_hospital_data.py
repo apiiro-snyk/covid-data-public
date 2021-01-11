@@ -124,13 +124,7 @@ def update(data_url: str):
     states_df[CommonFields.AGGREGATE_LEVEL] = "state"
 
     # Merge counties and states back together.
-    out_df = pd.concat(
-        [
-            # TODO(michael): Reincorporate county HHS hospital data once we've resolved the outstanding issues.
-            # counties_df,
-            states_df
-        ]
-    )
+    out_df = pd.concat([counties_df, states_df])
 
     # Add country metadata.
     out_df[CommonFields.COUNTRY] = "USA"
