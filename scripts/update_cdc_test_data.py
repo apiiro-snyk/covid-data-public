@@ -76,11 +76,6 @@ def transform(dataset: ccd_helpers.CovidCountyDataset):
 
     data = pd.DataFrame(output_data)
 
-    # Remove California data. Recent test positivity values were obviously broken starting Dec 15.
-    # Restore it once CDC fixes their data.
-    # See https://trello.com/c/2hNyaCHc/678-cdc-county-test-california-showing-spurious-numbers
-    data = data.loc[data[CommonFields.STATE] != "CA", :]
-
     return remove_trailing_zeros(data)
 
 
