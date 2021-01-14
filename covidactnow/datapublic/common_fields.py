@@ -111,6 +111,11 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
 
     CAN_LOCATION_PAGE_URL = "can_location_page_url"
 
+    VACCINES_ALLOCATED = "vaccines_allocated"
+    VACCINES_DISTRIBUTED = "vaccines_distributed"
+    VACCINATIONS_INITIATED = "vaccinations_initiated"
+    VACCINATIONS_COMPLETED = "vaccinations_completed"
+
 
 @enum.unique
 class PdFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):

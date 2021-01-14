@@ -8,6 +8,7 @@ python scripts/update_covid_tracking_data.py
 
 python scripts/update_nytimes_data.py
 python scripts/update_test_and_trace.py
+python scripts/update_cdc_vaccine_data.py
 # TODO(https://trello.com/c/PeQXdUCU): Fix Texas hospitalizations.
 python scripts/update_texas_tsa_hospitalizations.py || echo "Failed to update Texas Hospitals"
 python scripts/update_texas_fips_hospitalizations.py
