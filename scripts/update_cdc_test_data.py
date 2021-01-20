@@ -20,6 +20,10 @@ COUNTY_DATA_PATH = DATA_ROOT / "misc" / "fips_population.csv"
 OUTPUT_PATH = DATA_ROOT / "testing-cdc" / "timeseries-common.csv"
 
 
+DC_COUNTY_FIPS = "11001"
+DC_STATE_FIPS = "11"
+
+
 def _remove_trailing_zeros(series: pd.Series) -> pd.Series:
 
     series = series.copy()
@@ -47,36 +51,33 @@ def remove_trailing_zeros(data: pd.DataFrame) -> pd.DataFrame:
 
 def transform(dataset: ccd_helpers.CovidCountyDataset):
 
-    testing_df = dataset.query_variable_for_provider(
-        variable_name="pcr_tests_positive",
-        measurement="rolling_average_7_day",
-        provider="cdc",
-        unit="percentage",
+    variables = [
+        ccd_helpers.ScraperVariable(
+            variable_name="pcr_tests_positive",
+            measurement="rolling_average_7_day",
+            provider="cdc",
+            unit="percentage",
+            common_field=CommonFields.TEST_POSITIVITY_7D,
+        ),
+    ]
+    results = dataset.query_multiple_variables(variables)
+    # Test positivity should be a ratio
+    results.loc[:, CommonFields.TEST_POSITIVITY_7D] = (
+        results.loc[:, CommonFields.TEST_POSITIVITY_7D] / 100.0
     )
-    fips = testing_df[Fields.LOCATION]
-
     # Should only be picking up county all_df for now.  May need additional logic if states
     # are included as well
-    assert (testing_df[Fields.LOCATION].str.len() == 5).all()
+    assert (results[CommonFields.FIPS].str.len() == 5).all()
 
-    census_data = census_data_helpers.load_county_fips_data(COUNTY_DATA_PATH).data
-    census_data = census_data.set_index(CommonFields.FIPS)
-    counties = fips.map(census_data[CommonFields.COUNTY])
-    states = fips.map(census_data[CommonFields.STATE])
+    # Duplicating DC County results as state results because of a downstream
+    # use of how dc state data is used to override DC county data.
+    dc_results = results.loc[results[CommonFields.FIPS] == DC_COUNTY_FIPS, :].copy()
+    dc_results.loc[:, CommonFields.FIPS] = DC_STATE_FIPS
+    dc_results.loc[:, CommonFields.AGGREGATE_LEVEL] = "state"
 
-    output_data = {
-        CommonFields.FIPS: testing_df[Fields.LOCATION],
-        CommonFields.DATE: testing_df[Fields.DATE],
-        CommonFields.AGGREGATE_LEVEL: "county",
-        CommonFields.TEST_POSITIVITY_7D: testing_df[Fields.VALUE] / 100.0,
-        CommonFields.COUNTRY: "USA",
-        CommonFields.COUNTY: counties,
-        CommonFields.STATE: states,
-    }
+    results = pd.concat([results, dc_results])
 
-    data = pd.DataFrame(output_data)
-
-    return remove_trailing_zeros(data)
+    return remove_trailing_zeros(results)
 
 
 if __name__ == "__main__":
