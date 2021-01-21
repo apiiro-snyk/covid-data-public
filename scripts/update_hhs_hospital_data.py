@@ -62,6 +62,8 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
 
 def update(data_url: str):
 
+    # TODO(tom): Switch to ccd_helpers. See
+    #  https://github.com/covid-projections/covid-data-public/pull/196
     all_df = pd.read_parquet(data_url)
 
     variables = [

@@ -1,5 +1,7 @@
 import enum
 import pathlib
+
+import click
 import pandas as pd
 import structlog
 
@@ -80,12 +82,17 @@ def transform(dataset: ccd_helpers.CovidCountyDataset):
     return remove_trailing_zeros(results)
 
 
-if __name__ == "__main__":
-
+@click.command()
+@click.option("--fetch/--no-fetch", default=True)
+def main(fetch: bool):
     common_init.configure_logging()
     log = structlog.get_logger()
 
-    ccd_dataset = ccd_helpers.CovidCountyDataset.load_from_url()
+    ccd_dataset = ccd_helpers.CovidCountyDataset.load(fetch=fetch)
     all_df = transform(ccd_dataset)
 
     common_df.write_csv(all_df, OUTPUT_PATH, log)
+
+
+if __name__ == "__main__":
+    main()  # pylint: disable=no-value-for-parameter

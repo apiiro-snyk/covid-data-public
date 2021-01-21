@@ -1,9 +1,13 @@
 """Helpers to access and query data surfaced from the scraped Covid County Data.
 """
+import pathlib
 from typing import List
 import enum
 import dataclasses
+from typing import Optional
 
+import more_itertools
+import requests
 import structlog
 import pandas as pd
 from covidactnow.datapublic.common_fields import FieldNameAndCommonField
@@ -11,9 +15,12 @@ from covidactnow.datapublic.common_fields import GetByValueMixin
 from covidactnow.datapublic.common_fields import CommonFields
 from scripts import helpers
 
+DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
+
 # Airflow jobs output a single parquet file with all of the data - this is where
 # it is currently stored.
 DATA_URL = "https://storage.googleapis.com/us-east4-data-eng-scrapers-a02dc940-bucket/data/final/can_scrape_api_covid_us.parquet"
+DATA_PATH = DATA_ROOT / "can-scrape" / "can_scrape_api_covid_us.parquet"
 
 
 _logger = structlog.getLogger()
@@ -39,16 +46,25 @@ class Fields(GetByValueMixin, FieldNameAndCommonField, enum.Enum):
 
 @dataclasses.dataclass(frozen=True)
 class ScraperVariable:
-    """Represents a specific variable scraped in CAN Scraper Dataset"""
+    """Represents a specific variable scraped in CAN Scraper Dataset.
+
+    ScraperVariable has two modes:
+    * If `common_field`, `measurement` and `unit` are falsy the scraper variable is dropped.
+    * If they are truthy values from the scraper variable are copied to the output.
+    `query_multiple_variables` asserts that each ScraperVariable is in one of these modes.
+    Turning these into two different classes seems like more work than it is worth right now.
+
+    The table at https://github.com/covid-projections/can-scrapers/blob/main/can_tools/bootstrap_data/covid_variables.csv
+    """
 
     variable_name: str
-    measurement: str
     provider: str
-    unit: str
+    measurement: str = ""
+    unit: str = ""
+    common_field: Optional[CommonFields] = None
     age: str = "all"
     race: str = "all"
     sex: str = "all"
-    common_field: CommonFields = None
 
 
 @dataclasses.dataclass
@@ -56,47 +72,60 @@ class CovidCountyDataset:
 
     timeseries_df: pd.DataFrame
 
-    def query_variable_for_provider(
-        self, variable_name: str, measurement: str, provider: str, *, unit: str = None
-    ) -> pd.DataFrame:
-        """Queries a single variable for a given provider."""
+    def _get_rows(self, variable: ScraperVariable) -> pd.DataFrame:
         all_df = self.timeseries_df
+
         is_selected_data = (
-            (all_df[Fields.PROVIDER] == provider)
-            & (all_df[Fields.VARIABLE_NAME] == variable_name)
-            & (all_df[Fields.MEASUREMENT] == measurement)
-            & (all_df[Fields.AGE] == "all")
-            & (all_df[Fields.RACE] == "all")
-            & (all_df[Fields.SEX] == "all")
+            (all_df[Fields.PROVIDER] == variable.provider)
+            & (all_df[Fields.VARIABLE_NAME] == variable.variable_name)
+            & (all_df[Fields.AGE] == variable.age)
+            & (all_df[Fields.RACE] == variable.race)
+            & (all_df[Fields.SEX] == variable.sex)
         )
-        if unit:
-            is_selected_data = is_selected_data & (all_df[Fields.UNIT] == unit)
+        if variable.measurement:
+            is_selected_data = is_selected_data & (
+                all_df[Fields.MEASUREMENT] == variable.measurement
+            )
+        if variable.unit:
+            is_selected_data = is_selected_data & (all_df[Fields.UNIT] == variable.unit)
 
-        return all_df.loc[is_selected_data]
+        return all_df.loc[is_selected_data, :].copy()
 
-    def query_multiple_variables(self, variables: List[ScraperVariable]) -> pd.DataFrame:
+    def query_multiple_variables(
+        self, variables: List[ScraperVariable], *, log_provider_coverage_warnings: bool = False
+    ) -> pd.DataFrame:
         """Queries multiple variables returning wide df with variable names as columns.
 
         Args:
-            variable_queries: Variables to query
+            variables: Variables to query
+            log_provider_coverage_warnings: Log warnings when upstream data has variables not in
+              `variables` and hints when a variable has no data.
         """
-        all_df = self.timeseries_df
+        if log_provider_coverage_warnings:
+            self.check_variable_coverage(variables)
         selected_data = []
 
         for variable in variables:
+            # Check that `variable` agrees with stuff in the ScraperVariable docstring.
+            if variable.common_field is None:
+                assert variable.measurement == ""
+                assert variable.unit == ""
+                continue
+            else:
+                # Must be set when copying to the return value
+                assert variable.measurement
+                assert variable.unit
 
-            is_selected_data = (
-                (all_df[Fields.PROVIDER] == variable.provider)
-                & (all_df[Fields.VARIABLE_NAME] == variable.variable_name)
-                & (all_df[Fields.MEASUREMENT] == variable.measurement)
-                & (all_df[Fields.AGE] == variable.age)
-                & (all_df[Fields.RACE] == variable.race)
-                & (all_df[Fields.SEX] == variable.sex)
-            )
-            if variable.unit:
-                is_selected_data = is_selected_data & (all_df[Fields.UNIT] == variable.unit)
-
-            data = all_df.loc[is_selected_data]
+            data = self._get_rows(variable)
+            if data.empty and log_provider_coverage_warnings:
+                _logger.info("No data rows found for variable", variable=variable)
+                more_data = self._get_rows(dataclasses.replace(variable, measurement="", unit=""))
+                _logger.info(
+                    "Try these parameters",
+                    variable_name=variable.variable_name,
+                    measurement_counts=str(more_data[Fields.MEASUREMENT].value_counts().to_dict()),
+                    unit_counts=str(more_data[Fields.UNIT].value_counts().to_dict()),
+                )
 
             # Rename fields if common field name exists
             if variable.common_field:
@@ -122,11 +151,28 @@ class CovidCountyDataset:
         data.columns.name = None
         return data
 
-    @staticmethod
-    def load_from_url(url: str = DATA_URL) -> "CovidCountyDataset":
-        """Loads CovidCountyData from specficied url, performing minor cleanup."""
+    def check_variable_coverage(self, variables: List[ScraperVariable]):
+        provider_name = more_itertools.one(set(v.provider for v in variables))
+        provider_mask = self.timeseries_df[Fields.PROVIDER] == provider_name
+        counts = self.timeseries_df.loc[provider_mask, Fields.VARIABLE_NAME].value_counts()
+        variables_by_name = {var.variable_name: var for var in variables}
+        for variable_name, count in counts.iteritems():
+            if variable_name not in variables_by_name:
+                _logger.info(
+                    "Upstream has variable not in variables list",
+                    variable_name=variable_name,
+                    count=count,
+                )
 
-        all_df = pd.read_parquet(url)
+    @staticmethod
+    def load(*, fetch: bool) -> "CovidCountyDataset":
+        """Loads CovidCountyData, performing minor cleanup."""
+
+        if fetch:
+            response = requests.get(DATA_URL)
+            DATA_PATH.write_bytes(response.content)
+
+        all_df = pd.read_parquet(DATA_PATH)
         all_df[Fields.LOCATION] = helpers.fips_from_int(all_df[Fields.LOCATION])
 
         return CovidCountyDataset(all_df)
