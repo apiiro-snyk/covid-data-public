@@ -13,10 +13,11 @@ structlog-sentry==1.2.2
 covidcountydata==0.4.0
 -e .
 s3fs==0.4.2
-boto3==1.13.26
+boto3==1.16.57
 click==7.1.2
 xlrd==1.2.0
 git+https://github.com/reichlab/zoltpy/@e1917d05510b833220cdac4a9dcf14cd010d0863
 pymmwr==0.2.2
 beautifulsoup4==4.9.3
 pyarrow==2.0.0
+more-itertools==8.6.0
