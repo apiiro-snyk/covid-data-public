@@ -108,7 +108,7 @@ def transform(dataset: ccd_helpers.CovidCountyDataset):
             measurement="cumulative",
             unit="specimens",  # Ignores test_encounters and unique_people
             provider="state",
-            common_field=CommonFields.POSITIVE_CASES_VIRAL,
+            common_field=CommonFields.POSITIVE_TESTS_VIRAL,
         ),
         ccd_helpers.ScraperVariable(
             variable_name="total_vaccine_allocated",
