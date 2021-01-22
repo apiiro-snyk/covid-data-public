@@ -138,6 +138,13 @@ def transform(dataset: ccd_helpers.CovidCountyDataset):
             provider="state",
             common_field=CommonFields.VACCINATIONS_COMPLETED,
         ),
+        ccd_helpers.ScraperVariable(
+            variable_name="total_vaccine_doses_administered",
+            measurement="cumulative",
+            unit="doses",
+            provider="state",
+            common_field=CommonFields.VACCINES_ADMINISTERED,
+        ),
     ]
 
     results = dataset.query_multiple_variables(variables, log_provider_coverage_warnings=True)

@@ -111,8 +111,12 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
 
     CAN_LOCATION_PAGE_URL = "can_location_page_url"
 
+    # vaccines_ prefixed variables are in doses of vaccines
     VACCINES_ALLOCATED = "vaccines_allocated"
     VACCINES_DISTRIBUTED = "vaccines_distributed"
+    VACCINES_ADMINISTERED = "vaccines_administered"
+
+    # vaccinations_ prefixed variables are people vaccinated
     VACCINATIONS_INITIATED = "vaccinations_initiated"
     VACCINATIONS_COMPLETED = "vaccinations_completed"
 
