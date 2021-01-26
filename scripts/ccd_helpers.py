@@ -19,7 +19,7 @@ DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 
 # Airflow jobs output a single parquet file with all of the data - this is where
 # it is currently stored.
-DATA_URL = "https://storage.googleapis.com/us-east4-data-eng-scrapers-a02dc940-bucket/data/final/can_scrape_api_covid_us.parquet"
+DATA_URL = "https://storage.googleapis.com/can-scrape-outputs/final/can_scrape_api_covid_us.parquet"
 DATA_PATH = DATA_ROOT / "can-scrape" / "can_scrape_api_covid_us.parquet"
 
 

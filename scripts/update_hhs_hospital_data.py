@@ -17,7 +17,7 @@ DATA_ROOT = pathlib.Path(__file__).parent.parent / "data"
 COUNTY_DATA_PATH = DATA_ROOT / "misc" / "fips_population.csv"
 OUTPUT_PATH = DATA_ROOT / "hospital-hhs" / "timeseries-common.csv"
 
-DATA_URL = "https://storage.googleapis.com/us-east4-data-eng-scrapers-a02dc940-bucket/data/final/can_scrape_api_covid_us.parquet"
+DATA_URL = "https://storage.googleapis.com/can-scrape-outputs/final/can_scrape_api_covid_us.parquet"
 
 _logger = structlog.getLogger()
 
