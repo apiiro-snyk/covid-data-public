@@ -1,5 +1,7 @@
 import csv
 import pathlib
+
+import click
 import requests
 import structlog
 from pydantic import BaseModel, HttpUrl, DirectoryPath, FilePath
@@ -8,6 +10,7 @@ import pandas as pd
 import re
 from covidactnow.datapublic import common_df
 from covidactnow.datapublic import common_init
+from covidactnow.datapublic.common_fields import CommonFields
 from scripts import helpers
 
 # Cam gave Tom this URL in a DM in https://testandtrace.slack.com/
@@ -59,25 +62,35 @@ class TestAndTraceSyncer(BaseModel):
                     contact_tracers_count=contact_tracers_count,
                 )
 
-    def update(self, log):
-        todays_filename = self.date_today.isoformat() + ".csv"
-        todays_file_path = self.gsheets_copy_directory / todays_filename
-        todays_file_path.write_bytes(requests.get(self.source_url).content)
+    def update(self, *, fetch: bool, log):
+        if fetch:
+            todays_filename = self.date_today.isoformat() + ".csv"
+            todays_file_path = self.gsheets_copy_directory / todays_filename
+            todays_file_path.write_bytes(requests.get(self.source_url).content)
 
         result = pd.DataFrame.from_records(
             self.yield_dict_per_state_date(),
             columns=["fips", "state", "date", "contact_tracers_count"],
         ).sort_values(["fips", "date"])
+        result[CommonFields.COUNTRY] = "USA"
+        result[CommonFields.AGGREGATE_LEVEL] = "state"
         common_df.write_csv(result, self.state_timeseries_path, log)
 
 
-if __name__ == "__main__":
+@click.command()
+@click.option("--fetch/--no-fetch", default=True)
+def main(fetch: bool):
     common_init.configure_logging()
-    log = structlog.get_logger(__name__)
+    log = structlog.get_logger()
+
     TestAndTraceSyncer(
         source_url=SOURCE_URL,
         census_state_path=DATA_ROOT / "misc" / "state.txt",
         gsheets_copy_directory=DATA_ROOT / "test-and-trace" / "gsheet-copy",
         state_timeseries_path=DATA_ROOT / "test-and-trace" / "state_data.csv",
         date_today=date.today(),
-    ).update(log)
+    ).update(fetch=fetch, log=log)
+
+
+if __name__ == "__main__":
+    main()  # pylint: disable=no-value-for-parameter
