@@ -36,7 +36,7 @@ def rename_fields(
     if check_extra_fields:
         extra_fields = set(df.columns) - set(fields) - already_transformed_fields
         if extra_fields:
-            # If this warning happens in a test check that the sample data in test/data
+            # If this warning happens in a test check that the sample data in tests/data
             # has the same fields as the argument passed to `fields`.
             log.warning(EXTRA_COLUMNS_MESSAGE, extra_fields=extra_fields)
             print("-- Add the following lines to the appropriate Fields enum --")
@@ -46,7 +46,7 @@ def rename_fields(
             print("-- end of suggested new Fields --")
     missing_fields = set(fields) - set(df.columns)
     if missing_fields:
-        # If this warning happens in a test check that the sample data in test/data
+        # If this warning happens in a test check that the sample data in tests/data
         # has the same fields as the argument passed to `fields`.
         log.warning(MISSING_COLUMNS_MESSAGE, missing_fields=missing_fields)
     rename: MutableMapping[str, str] = {f: f for f in already_transformed_fields}

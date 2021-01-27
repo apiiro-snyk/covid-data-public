@@ -14,16 +14,16 @@ pytestmark = pytest.mark.filterwarnings("error")
 
 
 # Fetched with:
-# curl https://api.covidcountydata.org/swagger.json > test/data/api.covidcountydata.org_swagger.json
+# curl https://api.covidcountydata.org/swagger.json > tests/data/api.covidcountydata.org_swagger.json
 SWAGGER_JSON_URL = "https://api.covidcountydata.org/swagger.json"
-SWAGGER_JSON_PATH = "test/data/api.covidcountydata.org_swagger.json"
+SWAGGER_JSON_PATH = "tests/data/api.covidcountydata.org_swagger.json"
 
 # Fetched with:
-# curl -H "Accept: text/csv" https://api.covidcountydata.org/covid_us > test/data/api.covidcountydata.org_covid_us_all_csv
+# curl -H "Accept: text/csv" https://api.covidcountydata.org/covid_us > tests/data/api.covidcountydata.org_covid_us_all_csv
 # Dates and locations picked to get coverage of all the variables:
-# cat test/data/api.covidcountydata.org_covid_us_all_csv | csvgrep -c location -r '\A(48347|34002|34001|6025|26121|21|42009|19017|47)\Z' | csvgrep -c dt -r '(2020-06-13|2020-07-05|2020-10-07|2020-10-10)' > test/data/api.covidcountydata.org_covid_us_csv
+# cat tests/data/api.covidcountydata.org_covid_us_all_csv | csvgrep -c location -r '\A(48347|34002|34001|6025|26121|21|42009|19017|47)\Z' | csvgrep -c dt -r '(2020-06-13|2020-07-05|2020-10-07|2020-10-10)' > tests/data/api.covidcountydata.org_covid_us_csv
 COVID_US_URL = "https://api.covidcountydata.org/covid_us"
-COVID_US_PATH = "test/data/api.covidcountydata.org_covid_us_csv"
+COVID_US_PATH = "tests/data/api.covidcountydata.org_covid_us_csv"
 
 
 # Remote requests are mocked out so in theory this key is never sent over the network.
