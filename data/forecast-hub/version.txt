@@ -1,2 +1,2 @@
-Updated on 2021-02-02T11:56:49.481972
-Using forecast from 2021-01-25
+Updated on 2021-02-02T14:49:19.157623
+Using forecast from 2021-02-01
