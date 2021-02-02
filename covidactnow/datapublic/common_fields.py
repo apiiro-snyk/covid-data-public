@@ -116,9 +116,15 @@ class CommonFields(GetByValueMixin, ValueAsStrMixin, FieldName, enum.Enum):
     VACCINES_DISTRIBUTED = "vaccines_distributed"
     VACCINES_ADMINISTERED = "vaccines_administered"
 
-    # vaccinations_ prefixed variables are people vaccinated
+    # vaccinations_ prefixed variables are people vaccinated.
+    # _pct suffix is percent of the population which may be copied from an external source,
+    # for example
+    # https://github.com/covid-projections/can-scrapers/blob/main/can_tools/scrapers/official/TN/tn_vaccine.py
+    # or derived from the count of people vaccinated.
     VACCINATIONS_INITIATED = "vaccinations_initiated"
+    VACCINATIONS_INITIATED_PCT = "vaccinations_initiated_pct"
     VACCINATIONS_COMPLETED = "vaccinations_completed"
+    VACCINATIONS_COMPLETED_PCT = "vaccinations_completed_pct"
 
 
 @enum.unique

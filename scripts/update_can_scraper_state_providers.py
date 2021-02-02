@@ -132,11 +132,25 @@ def transform(dataset: ccd_helpers.CovidCountyDataset):
             common_field=CommonFields.VACCINATIONS_INITIATED,
         ),
         ccd_helpers.ScraperVariable(
+            variable_name="total_vaccine_initiated",
+            measurement="current",
+            unit="percentage",
+            provider="state",
+            common_field=CommonFields.VACCINATIONS_INITIATED_PCT,
+        ),
+        ccd_helpers.ScraperVariable(
             variable_name="total_vaccine_completed",
             measurement="cumulative",
             unit="people",
             provider="state",
             common_field=CommonFields.VACCINATIONS_COMPLETED,
+        ),
+        ccd_helpers.ScraperVariable(
+            variable_name="total_vaccine_completed",
+            measurement="current",
+            unit="percentage",
+            provider="state",
+            common_field=CommonFields.VACCINATIONS_COMPLETED_PCT,
         ),
         ccd_helpers.ScraperVariable(
             variable_name="total_vaccine_doses_administered",
