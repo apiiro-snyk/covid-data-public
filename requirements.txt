@@ -21,3 +21,4 @@ pymmwr==0.2.2
 beautifulsoup4==4.9.3
 pyarrow==2.0.0
 more-itertools==8.6.0
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
