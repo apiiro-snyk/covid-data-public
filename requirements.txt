@@ -1,13 +1,13 @@
-numpy==1.18.2
-certifi==2019.11.28
+numpy==1.22.2
+certifi==2023.7.22
 chardet==3.0.4
-idna==2.9
+idna==3.7
 pandas==1.0.3
 pytz==2019.3
-requests==2.23.0
-urllib3==1.25.8
+requests==2.32.2
+urllib3==1.26.19
 python-dateutil==2.8.1
-pydantic==1.4
+pydantic==1.10.13
 structlog==20.1.0
 structlog-sentry==1.2.2
 covidcountydata==0.4.0
@@ -19,5 +19,7 @@ xlrd==1.2.0
 git+https://github.com/reichlab/zoltpy/@e1917d05510b833220cdac4a9dcf14cd010d0863
 pymmwr==0.2.2
 beautifulsoup4==4.9.3
-pyarrow==2.0.0
+pyarrow==14.0.1
 more-itertools==8.6.0
+dnspython>=2.6.1 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
