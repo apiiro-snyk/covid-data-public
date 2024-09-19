@@ -9,3 +9,7 @@ pre-commit==2.4.0
 temppathlib==1.0.3
 requests-mock==1.8.0
 freezegun==1.0.0
+certifi>=2024.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+idna>=3.7 # not directly required, pinned by Snyk to avoid a vulnerability
+jupyter-core>=4.11.2 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.31.0 # not directly required, pinned by Snyk to avoid a vulnerability
