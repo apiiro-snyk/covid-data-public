@@ -2,10 +2,12 @@ pytest==5.4.2
 pytest-pylint==0.17.0
 pytest-xdist==1.32.0
 pytest-mock >= 1.10.4
-black==19.10b0
+black==24.3.0
 nbstripout==0.3.7
-pylint==2.5.2
+pylint==2.7.0
 pre-commit==2.4.0
 temppathlib==1.0.3
 requests-mock==1.8.0
 freezegun==1.0.0
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
